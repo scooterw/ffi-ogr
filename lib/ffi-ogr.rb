@@ -80,16 +80,39 @@ module OGR
     attach_function :OGRGetDriver, [:int], :pointer
     attach_function :OGRGetDriverByName, [:string], :pointer
     attach_function :OGROpen, [:string, :int, :pointer], :pointer
+    attach_function :OGR_DS_GetName, [:pointer], :string
+    attach_function :OGR_DS_GetLayerCount, [:pointer], :int
+    attach_function :OGR_DS_GetLayer, [:pointer, :int], :pointer
     attach_function :OGR_DS_GetLayerByName, [:pointer, :string], :pointer
+    attach_function :OGR_DS_DeleteLayer, [:pointer, :int], :pointer
+    attach_function :OGR_L_GetGeomType, [:pointer], :ogr_geometry_type
+    attach_function :OGR_L_GetSpatialFilter, [:pointer], :pointer
+    attach_function :OGR_L_SetSpatialFilter, [:pointer, :pointer], :void
+    attach_function :OGR_L_SetSpatialFilterRect, [:pointer, :double, :double, :double, :double], :void
+    attach_function :OGR_L_SetAttributeFilter, [:pointer, :string], :pointer
     attach_function :OGR_L_ResetReading, [:pointer], :void
     attach_function :OGR_L_GetNextFeature, [:pointer], :pointer
+    attach_function :OGR_L_SetNextByIndex, [:pointer, :long], :pointer
+    attach_function :OGR_L_GetFeature, [:pointer, :long], :pointer
+    attach_function :OGR_L_SetFeature, [:pointer, :pointer], :pointer
+    attach_function :OGR_L_CreateFeature, [:pointer, :pointer], :pointer
+    attach_function :OGR_L_DeleteFeature, [:pointer, :long], :pointer
     attach_function :OGR_L_GetLayerDefn, [:pointer], :pointer
+    attach_function :OGR_L_GetSpatialRef, [:pointer], :pointer
+    attach_function :OGR_L_GetFeatureCount, [:pointer, :int], :int
+    attach_function :OGR_L_GetExtent, [:pointer, :pointer, :int], :pointer
     attach_function :OGR_FD_GetFieldCount, [:pointer], :int
     attach_function :OGR_FD_GetFieldDefn, [:pointer, :int], :pointer
+    attach_function :OGR_Fld_GetNameRef, [:pointer], :string
     attach_function :OGR_Fld_GetType, [:pointer], :ogr_field_type
     attach_function :OGR_F_GetFieldAsInteger, [:pointer, :int], :int
     attach_function :OGR_F_GetFieldAsDouble, [:pointer, :int], :double
     attach_function :OGR_F_GetFieldAsString, [:pointer, :int], :string
+    #attach_function :OGR_F_GetFieldAsIntegerList, [:pointer, :int, :pointer], :pointer
+    #attach_function :OGR_F_GetFieldAsDoubleList, [:pointer, :int, :pointer], :pointer
+    #attach_function :OGR_F_GetFieldAsStringList, [:pointer, :int], :pointer
+    #attach_function :OGR_F_GetFieldAsBinary, [:pointer, :int, :pointer], :pointer
+    #attach_function :OGR_F_GetFieldAsDateTime, [:pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :pointer
     attach_function :OGR_F_GetGeometryRef, [:pointer], :pointer
     attach_function :OGR_G_GetGeometryType, [:pointer], :ogr_geometry_type
     attach_function :OGR_G_GetX, [:pointer, :int], :double
