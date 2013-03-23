@@ -22,6 +22,9 @@ Gem::Specification.new do |gem|
   gem.bindir = 'bin'
   gem.executables = ['ogr_console']
 
+  gem.add_dependency 'ffi', '>= 1.5.0'
+  gem.add_dependency 'multi_json'
+
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
 end

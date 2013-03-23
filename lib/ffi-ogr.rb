@@ -1,4 +1,5 @@
 require 'ffi'
+require 'multi_json'
 
 module OGR
   OGR_BASE = File.join(File.dirname(__FILE__), 'ffi-ogr')
@@ -73,6 +74,12 @@ module OGR
       :wkb_geometry_collection_25d, 0x80000007
     ]
 
+    enum :ogr_justification, [
+      :undefined, 0,
+      :left, 1,
+      :right, 2
+    ]
+
     attach_function :OGRRegisterAll, [], :void
     attach_function :OGR_Dr_GetName, [:pointer], :string
     attach_function :OGR_Dr_Open, [:pointer, :string, :int], :pointer
@@ -80,11 +87,19 @@ module OGR
     attach_function :OGRGetDriver, [:int], :pointer
     attach_function :OGRGetDriverByName, [:string], :pointer
     attach_function :OGROpen, [:string, :int, :pointer], :pointer
+    attach_function :OGR_DS_Destroy, [:pointer], :void
     attach_function :OGR_DS_GetName, [:pointer], :string
     attach_function :OGR_DS_GetLayerCount, [:pointer], :int
     attach_function :OGR_DS_GetLayer, [:pointer, :int], :pointer
     attach_function :OGR_DS_GetLayerByName, [:pointer, :string], :pointer
     attach_function :OGR_DS_DeleteLayer, [:pointer, :int], :pointer
+    attach_function :OGR_DS_GetDriver, [:pointer], :pointer
+    attach_function :OGR_DS_CreateLayer, [:pointer, :string, :pointer, :ogr_geometry_type, :string], :pointer
+    attach_function :OGR_DS_CopyLayer, [:pointer, :pointer, :string, :string], :pointer
+    attach_function :OGR_DS_TestCapability, [:pointer, :string], :int
+    attach_function :OGR_DS_ExecuteSQL, [:pointer, :string, :pointer, :string], :pointer
+    attach_function :OGR_DS_ReleaseResultSet, [:pointer, :pointer], :void
+    attach_function :OGR_DS_SyncToDisk, [:pointer], :pointer
     attach_function :OGR_L_GetGeomType, [:pointer], :ogr_geometry_type
     attach_function :OGR_L_GetSpatialFilter, [:pointer], :pointer
     attach_function :OGR_L_SetSpatialFilter, [:pointer, :pointer], :void
@@ -103,8 +118,21 @@ module OGR
     attach_function :OGR_L_GetExtent, [:pointer, :pointer, :int], :pointer
     attach_function :OGR_FD_GetFieldCount, [:pointer], :int
     attach_function :OGR_FD_GetFieldDefn, [:pointer, :int], :pointer
+    attach_function :OGR_Fld_Create, [:string, :ogr_field_type], :pointer
+    attach_function :OGR_Fld_Destroy, [:pointer], :void
+    attach_function :OGR_Fld_SetName, [:pointer, :string], :void
     attach_function :OGR_Fld_GetNameRef, [:pointer], :string
     attach_function :OGR_Fld_GetType, [:pointer], :ogr_field_type
+    attach_function :OGR_Fld_SetType, [:pointer, :ogr_field_type], :void
+    attach_function :OGR_Fld_GetJustify, [:pointer], :ogr_justification
+    attach_function :OGR_Fld_SetJustify, [:pointer, :ogr_justification], :void
+    attach_function :OGR_Fld_GetWidth, [:pointer], :int
+    attach_function :OGR_Fld_SetWidth, [:pointer, :int], :void
+    attach_function :OGR_Fld_GetPrecision, [:pointer], :int
+    attach_function :OGR_Fld_SetPrecision, [:pointer, :int], :void
+    attach_function :OGR_Fld_Set, [:pointer, :string, :ogr_field_type, :int, :int, :ogr_justification], :void
+    attach_function :OGR_Fld_IsIgnored, [:pointer], :int
+    attach_function :OGR_Fld_SetIgnored, [:pointer, :int], :void
     attach_function :OGR_F_GetFieldAsInteger, [:pointer, :int], :int
     attach_function :OGR_F_GetFieldAsDouble, [:pointer, :int], :double
     attach_function :OGR_F_GetFieldAsString, [:pointer, :int], :string
@@ -114,12 +142,99 @@ module OGR
     #attach_function :OGR_F_GetFieldAsBinary, [:pointer, :int, :pointer], :pointer
     #attach_function :OGR_F_GetFieldAsDateTime, [:pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :pointer
     attach_function :OGR_F_GetGeometryRef, [:pointer], :pointer
+    attach_function :OGR_G_CreateFromWkb, [:pointer, :pointer, :pointer, :int], :pointer
+    attach_function :OGR_G_CreateFromWkt, [:pointer, :pointer, :pointer], :pointer
+    attach_function :OGR_G_DestroyGeometry, [:pointer], :void
+    attach_function :OGR_G_CreateGeometry, [:ogr_geometry_type], :pointer
+    attach_function :OGR_G_ApproximateArcAngles, [:double, :double, :double, :double, :double, :double, :double, :double, :double], :pointer
+    attach_function :OGR_G_ForceToPolygon, [:pointer], :pointer
+    #attach_function :OGR_G_ForceToLineString, [:pointer], :pointer
+    attach_function :OGR_G_ForceToMultiPolygon, [:pointer], :pointer
+    attach_function :OGR_G_ForceToMultiPoint, [:pointer], :pointer
+    attach_function :OGR_G_ForceToMultiLineString, [:pointer], :pointer
+    attach_function :OGR_G_GetDimension, [:pointer], :int
+    attach_function :OGR_G_GetCoordinateDimension, [:pointer], :int
+    attach_function :OGR_G_SetCoordinateDimension, [:pointer, :int], :void
+    attach_function :OGR_G_Clone, [:pointer], :pointer
+    attach_function :OGR_G_GetEnvelope, [:pointer, :pointer], :void
+    attach_function :OGR_G_GetEnvelope3D, [:pointer, :pointer], :void
+    attach_function :OGR_G_ImportFromWkb, [:pointer, :pointer, :int], :pointer
+    attach_function :OGR_G_ExportToWkb, [:pointer, :pointer, :pointer], :pointer
+    attach_function :OGR_G_WkbSize, [:pointer], :int
+    attach_function :OGR_G_ImportFromWkt, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_ExportToWkt, [:pointer, :pointer], :pointer
     attach_function :OGR_G_GetGeometryType, [:pointer], :ogr_geometry_type
+    attach_function :OGR_G_GetGeometryName, [:pointer], :string
+    attach_function :OGR_G_DumpReadable, [:pointer, :pointer, :string], :void
+    attach_function :OGR_G_FlattenTo2D, [:pointer], :void
+    attach_function :OGR_G_CloseRings, [:pointer], :void
+    attach_function :OGR_G_CreateFromGML, [:string], :pointer
+    attach_function :OGR_G_ExportToGML, [:pointer], :string
+    #attach_function :OGR_G_ExportToGMLEx, [:pointer, :pointer], :string
+    attach_function :OGR_G_ExportToKML, [:pointer, :string], :string
+    attach_function :OGR_G_ExportToJson, [:pointer], :string
+    attach_function :OGR_G_ExportToJsonEx, [:pointer, :string], :string
+    attach_function :OGR_G_AssignSpatialReference, [:pointer, :pointer], :void
+    attach_function :OGR_G_GetSpatialReference, [:pointer], :pointer
+    attach_function :OGR_G_Transform, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_TransformTo, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_Simplify, [:pointer, :double], :pointer
+    attach_function :OGR_G_SimplifyPreserveTopology, [:pointer, :double], :pointer
+    attach_function :OGR_G_Segmentize, [:pointer, :double], :pointer
+    attach_function :OGR_G_Intersects, [:pointer, :pointer], :int
+    attach_function :OGR_G_Equals, [:pointer, :pointer], :int
+    attach_function :OGR_G_Disjoint, [:pointer, :pointer], :int
+    attach_function :OGR_G_Touches, [:pointer, :pointer], :int
+    attach_function :OGR_G_Crosses, [:pointer, :pointer], :int
+    attach_function :OGR_G_Within, [:pointer, :pointer], :int
+    attach_function :OGR_G_Contains, [:pointer, :pointer], :int
+    attach_function :OGR_G_Overlaps, [:pointer, :pointer], :int
+    attach_function :OGR_G_Boundary, [:pointer], :pointer
+    attach_function :OGR_G_ConvexHull, [:pointer], :pointer
+    attach_function :OGR_G_Buffer, [:pointer, :double, :int], :pointer
+    attach_function :OGR_G_Intersection, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_Union, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_UnionCascaded, [:pointer], :pointer
+    #attach_function :OGR_G_PointOnSurface, [:pointer], :pointer
+    attach_function :OGR_G_Difference, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_SymDifference, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_Distance, [:pointer, :pointer], :double
+    attach_function :OGR_G_Length, [:pointer], :double
+    attach_function :OGR_G_Area, [:pointer], :double
+    attach_function :OGR_G_Centroid, [:pointer, :pointer], :int
+    attach_function :OGR_G_Empty, [:pointer], :void
+    attach_function :OGR_G_IsEmpty, [:pointer], :int
+    attach_function :OGR_G_IsValid, [:pointer], :int
+    attach_function :OGR_G_IsSimple, [:pointer], :int
+    attach_function :OGR_G_IsRing, [:pointer], :int
+    attach_function :OGR_G_Polygonize, [:pointer], :pointer
+    attach_function :OGR_G_GetPointCount, [:pointer], :int
+    attach_function :OGR_G_GetPoints, [:pointer, :pointer, :int, :pointer, :int, :pointer, :int], :int
     attach_function :OGR_G_GetX, [:pointer, :int], :double
     attach_function :OGR_G_GetY, [:pointer, :int], :double
+    attach_function :OGR_G_GetZ, [:pointer, :int], :double
+    attach_function :OGR_G_GetPoint, [:pointer, :int, :pointer, :pointer, :pointer], :void
+    attach_function :OGR_G_SetPoint, [:pointer, :int, :double, :double, :double], :void
+    attach_function :OGR_G_SetPoint_2D, [:pointer, :int, :double, :double], :void
+    attach_function :OGR_G_AddPoint, [:pointer, :double, :double, :double], :void
+    attach_function :OGR_G_AddPoint_2D, [:pointer, :double, :double], :void
+    attach_function :OGR_G_GetGeometryCount, [:pointer], :int
+    attach_function :OGR_G_GetGeometryRef, [:pointer, :int], :pointer
+    attach_function :OGR_G_AddGeometry, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_AddGeometryDirectly, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_RemoveGeometry, [:pointer, :int, :int], :pointer
     attach_function :OGR_F_Destroy, [:pointer], :void
-    attach_function :OGR_DS_Destroy, [:pointer], :void
   end
 
   class << self;end
 end
+
+
+
+
+
+
+
+
+
+
