@@ -9,7 +9,12 @@ module OGR
   autoload :Tools, File.join(OGR_BASE, 'tools')
   autoload :Feature, File.join(OGR_BASE, 'feature')
   autoload :Geometry, File.join(OGR_BASE, 'geometry')
+  autoload :Point, File.join(OGR_BASE, 'point')
+  autoload :LineString, File.join(OGR_BASE, 'line_string')
   autoload :Polygon, File.join(OGR_BASE, 'polygon')
+  autoload :MultiPoint, File.join(OGR_BASE, 'multi_point')
+  autoload :MultiLineString, File.join(OGR_BASE, 'multi_line_string')
+  autoload :MultiPolygon, File.join(OGR_BASE, 'multi_polygon')
 
   module FFIOGR
     def self.search_paths

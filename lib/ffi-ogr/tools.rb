@@ -22,8 +22,16 @@ module OGR
         klass = case geom_type
         when :wkb_point
           OGR::Point
+        when :wkb_line_string
+          OGR::LineString
         when :wkb_polygon
           OGR::Polygon
+        when :wkb_multi_point
+          OGR::MultiPoint
+        when :wkb_multi_line_string
+          OGR::MultiLineString
+        when :wkb_multi_polygon
+          OGR::MultiPolygon
         end
 
         klass.new(geom_ptr, options[:auto_free])

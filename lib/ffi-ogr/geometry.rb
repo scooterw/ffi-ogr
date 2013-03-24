@@ -4,12 +4,10 @@ module OGR
 
     def initialize(ptr, auto_free=true)
       @ptr = FFI::AutoPointer.new(ptr, self.class.method(:release))
-      @ptr.autorelease = auto_free
+      #@ptr.autorelease = auto_free
     end
 
-    def self.release(ptr)
-      FFIOGR.OGR_G_DestroyGeometry(ptr)
-    end
+    def self.release(ptr);end
 
     def geom_type
       FFIOGR.OGR_G_GetGeometryType(@ptr)
@@ -19,8 +17,9 @@ module OGR
       MultiJson.load(FFIOGR.OGR_G_ExportToJson(@ptr))
     end
 
-    def to_kml
-      FFIOGR.OGR_G_ExportToKML(@ptr)
+    def to_kml(elevation=nil)
+      elevation = String(elevation) unless elevation.nil?
+      FFIOGR.OGR_G_ExportToKML(@ptr, elevation)
     end
   end
 end
