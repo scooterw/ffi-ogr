@@ -5,6 +5,8 @@ module OGR
   OGR_BASE = File.join(File.dirname(__FILE__), 'ffi-ogr')
 
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
+  autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
+  autoload :Tools, File.join(OGR_BASE, 'tools')
 
   module FFIOGR
     def self.search_paths
