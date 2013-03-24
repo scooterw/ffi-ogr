@@ -5,7 +5,7 @@ module OGR
   OGR_BASE = File.join(File.dirname(__FILE__), 'ffi-ogr')
 
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
-  autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
+  autoload :DataSource, File.join(OGR_BASE, 'data_source')
   autoload :Tools, File.join(OGR_BASE, 'tools')
   autoload :Feature, File.join(OGR_BASE, 'feature')
   autoload :Geometry, File.join(OGR_BASE, 'geometry')

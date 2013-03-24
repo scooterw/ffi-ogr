@@ -1,10 +1,10 @@
 module OGR
   module Tools
     class << self
-      def cast_shapefile(shp_ptr, options={})
+      def cast_data_source(ds_ptr, options={})
         options = {auto_free: true}.merge(options)
-        raise RuntimeError.new("SHP pointer is NULL") if shp_ptr.null?
-        Shapefile.new shp_ptr, options[:auto_free]
+        raise RuntimeError.new("Data Source pointer is NULL") if ds_ptr.null?
+        DataSource.new ds_ptr, options[:auto_free]
       end
 
       def cast_feature(f_ptr, options={})

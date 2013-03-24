@@ -15,8 +15,8 @@ module OGR
     end
 
     def read(shp_path, writeable=false)
-      ptr = OGR_Dr_Open(@driver, File.expand_path(shp_path), TF_MAP[writeable])
-      OGR::Tools.cast_shapefile(ptr)
+      ds = OGR_Dr_Open(@driver, File.expand_path(shp_path), TF_MAP[writeable])
+      OGR::Tools.cast_data_source(ds)
     end
   end
 end

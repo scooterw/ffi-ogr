@@ -1,15 +1,15 @@
 module OGR
-  class Shapefile
+  class DataSource
     include FFIOGR
 
-    attr_accessor :ptr
+    attr_accessor :ds
 
     def initialize(*args)
       if args.first.instance_of? FFI::Pointer
-        @shp = FFI::AutoPointer.new(args.first, self.class.method(:release))
-        @shp.autorelease = true
+        @ds = FFI::AutoPointer.new(args.first, self.class.method(:release))
+        @ds.autorelease = true
       else
-        @shp = 'shapefile'
+        @ds = 'data_source'
       end
     end
 
@@ -20,10 +20,10 @@ module OGR
     def get_layers
       layers = []
 
-      num_layers = OGR_DS_GetLayerCount(@shp)
+      num_layers = OGR_DS_GetLayerCount(@ds)
 
       for i in (0...num_layers) do
-        layers << OGR_DS_GetLayer(@shp, i)
+        layers << OGR_DS_GetLayer(@ds, i)
       end
 
       layers
@@ -58,15 +58,15 @@ module OGR
     alias_method :fields, :get_fields
 
     def to_geojson(pretty=false)
-      if @shp && @shp.instance_of?(FFI::AutoPointer)
+      if @ds && @ds.instance_of?(FFI::AutoPointer)
         ptr_to_geojson(pretty)
       else
-        shp_to_geojson(pretty)
+        ds_to_geojson(pretty)
       end
     end
 
-    def shp_to_geojson(pretty=false)
-      @shp
+    def ds_to_geojson(pretty=false)
+      @ds
     end
 
     def ptr_to_geojson(pretty=false)
