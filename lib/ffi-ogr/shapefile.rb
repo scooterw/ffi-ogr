@@ -2,71 +2,75 @@ module OGR
   class Shapefile
     include FFIOGR
 
-    def initialize(ptr, auto_free=true)
-      @ptr = FFI::AutoPointer.new(ptr, self.class.method(:release))
-      @ptr.autorelease = auto_free
+    attr_accessor :ptr
+
+    def initialize(*args)
+      if args.first.instance_of? FFI::Pointer
+        @shp = FFI::AutoPointer.new(args.first, self.class.method(:release))
+        @shp.autorelease = true
+      else
+        @shp = 'shapefile'
+      end
     end
 
     def self.release(ptr)
       FFIOGR.OGR_DS_Destroy(ptr)
     end
 
-    def to_geojson(pretty=false)
-      features = []
+    def get_layers
+      layers = []
 
-      num_layers = OGR_DS_GetLayerCount(@ptr)
+      num_layers = OGR_DS_GetLayerCount(@shp)
 
       for i in (0...num_layers) do
-        h_layer = OGR_DS_GetLayer(@ptr, i)
-        OGR_L_ResetReading(h_layer)
+        layers << OGR_DS_GetLayer(@shp, i)
+      end
 
-        num_features = OGR_L_GetFeatureCount(h_layer, 0)
+      layers
+    end
+    alias_method :layers, :get_layers
 
-        for j in (0...num_features) do
-          h_feature = OGR_L_GetNextFeature(h_layer)
+    def get_features
+      features = []
 
-          unless h_feature.null?
-            properties = {}
+      layers.each do |layer|
+        OGR_L_ResetReading(layer)
 
-            field_defn = OGR_L_GetLayerDefn(h_layer)
-            num_fields = OGR_FD_GetFieldCount(field_defn)
+        num_features = OGR_L_GetFeatureCount(layer, 0)
 
-            for k in (0...num_fields) do
-              fd = OGR_FD_GetFieldDefn(field_defn, k)
-
-              field_name = OGR_Fld_GetNameRef(fd)
-
-              field_type = OGR_Fld_GetType(fd)
-
-              case field_type
-              when :integer
-                field_value = OGR_F_GetFieldAsInteger(h_feature, k)
-              when :real
-                field_value = OGR_F_GetFieldAsDouble(h_feature, k)
-              else
-                field_value = OGR_F_GetFieldAsString(h_feature, k)
-              end
-
-              properties[field_name] = field_value
-            end
-
-            h_geometry = OGR_F_GetGeometryRef(h_feature)
-            geometry = MultiJson.load(OGR_G_ExportToJson(h_geometry))
-
-            feature = {
-              type: 'Feature',
-              geometry: geometry,
-              properties: properties
-            }
-
-            features << feature
-          end
-
-          OGR_F_Destroy(h_feature)
+        for i in (0...num_features) do
+          features << OGR::Tools.cast_feature(OGR_L_GetNextFeature(layer))
         end
       end
 
-      MultiJson.dump({type: 'FeatureCollection', features: features}, pretty: pretty)
+      features
+    end
+    alias_method :features, :get_features
+
+    def get_geometries
+      features.map {|f| OGR::Tools.cast_geometry(f.geometry)}
+    end
+    alias_method :geometries, :get_geometries
+
+    def get_fields
+      features.map {|f| f.fields}
+    end
+    alias_method :fields, :get_fields
+
+    def to_geojson(pretty=false)
+      if @shp && @shp.instance_of?(FFI::AutoPointer)
+        ptr_to_geojson(pretty)
+      else
+        shp_to_geojson(pretty)
+      end
+    end
+
+    def shp_to_geojson(pretty=false)
+      @shp
+    end
+
+    def ptr_to_geojson(pretty=false)
+      MultiJson.dump({type: 'FeatureCollection', features: features.map {|f| f.to_geojson}}, pretty: pretty)
     end
   end
 end

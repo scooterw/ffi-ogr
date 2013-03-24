@@ -7,6 +7,9 @@ module OGR
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
   autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
   autoload :Tools, File.join(OGR_BASE, 'tools')
+  autoload :Feature, File.join(OGR_BASE, 'feature')
+  autoload :Geometry, File.join(OGR_BASE, 'geometry')
+  autoload :Polygon, File.join(OGR_BASE, 'polygon')
 
   module FFIOGR
     def self.search_paths
@@ -85,6 +88,10 @@ module OGR
     attach_function :OGRRegisterAll, [], :void
     attach_function :OGR_Dr_GetName, [:pointer], :string
     attach_function :OGR_Dr_Open, [:pointer, :string, :int], :pointer
+    attach_function :OGR_Dr_TestCapability, [:pointer, :string], :int
+    attach_function :OGR_Dr_CreateDataSource, [:pointer, :string, :string], :pointer
+    attach_function :OGR_Dr_CopyDataSource, [:pointer, :pointer, :string, :string], :pointer
+    attach_function :OGR_Dr_DeleteDataSource, [:pointer, :string], :pointer
     attach_function :OGRGetDriverCount, [], :int
     attach_function :OGRGetDriver, [:int], :pointer
     attach_function :OGRGetDriverByName, [:string], :pointer
@@ -143,7 +150,14 @@ module OGR
     #attach_function :OGR_F_GetFieldAsStringList, [:pointer, :int], :pointer
     #attach_function :OGR_F_GetFieldAsBinary, [:pointer, :int, :pointer], :pointer
     #attach_function :OGR_F_GetFieldAsDateTime, [:pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :pointer
+    attach_function :OGR_F_GetDefnRef, [:pointer], :pointer
+    attach_function :OGR_F_GetFieldCount, [:pointer], :int
+    attach_function :OGR_F_GetFieldDefnRef, [:pointer, :int], :pointer
+    attach_function :OGR_F_GetFieldIndex, [:pointer, :string], :int
+    attach_function :OGR_F_IsFieldSet, [:pointer, :int], :int
     attach_function :OGR_F_GetGeometryRef, [:pointer], :pointer
+    attach_function :OGR_F_GetFID, [:pointer], :long
+    attach_function :OGR_F_SetFID, [:pointer, :long], :pointer
     attach_function :OGR_G_CreateFromWkb, [:pointer, :pointer, :pointer, :int], :pointer
     attach_function :OGR_G_CreateFromWkt, [:pointer, :pointer, :pointer], :pointer
     attach_function :OGR_G_DestroyGeometry, [:pointer], :void
