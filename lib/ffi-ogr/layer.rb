@@ -18,11 +18,13 @@ module OGR
       FFIOGR.OGR_Fld_Destroy(field)
     end
 
-    def add_value_to_field(name, value);end
-
-    def add_feature
+    def create_feature
       feature = FFIOGR.OGR_F_Create(FFIOGR.OGR_L_GetLayerDefn(@ptr))
       OGR::Tools.cast_feature(feature)
+    end
+
+    def add_feature(feature)
+      FFIOGR.OGR_L_CreateFeature(@ptr, feature)
     end
   end
 end
