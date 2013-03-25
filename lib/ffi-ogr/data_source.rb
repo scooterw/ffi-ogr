@@ -26,7 +26,7 @@ module OGR
       num_layers = OGR_DS_GetLayerCount(@ds)
 
       for i in (0...num_layers) do
-        layers << OGR_DS_GetLayer(@ds, i)
+        layers << OGR::Tools.cast_layer(OGR_DS_GetLayer(@ds, i))
       end
 
       layers
@@ -34,19 +34,7 @@ module OGR
     alias_method :layers, :get_layers
 
     def get_features
-      features = []
-
-      layers.each do |layer|
-        OGR_L_ResetReading(layer)
-
-        num_features = OGR_L_GetFeatureCount(layer, 0)
-
-        for i in (0...num_features) do
-          features << OGR::Tools.cast_feature(OGR_L_GetNextFeature(layer))
-        end
-      end
-
-      features
+      layers.map {|l| l.features}.first
     end
     alias_method :features, :get_features
 

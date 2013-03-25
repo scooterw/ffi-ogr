@@ -26,5 +26,19 @@ module OGR
     def add_feature(feature)
       FFIOGR.OGR_L_CreateFeature(@ptr, feature)
     end
+
+    def get_features
+      features = []
+
+      FFIOGR.OGR_L_ResetReading(@ptr)
+      num_features = FFIOGR.OGR_L_GetFeatureCount(@ptr, 0)
+
+      for i in (0...num_features) do
+        features << OGR::Tools.cast_feature(FFIOGR.OGR_L_GetNextFeature(@ptr))
+      end
+
+      features
+    end
+    alias_method :features, :get_features
   end
 end

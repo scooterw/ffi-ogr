@@ -1,10 +1,10 @@
 module OGR
-  class ShpWriter < Writer
+  class GeoJSONWriter < Writer
     include OGR::FFIOGR
 
     def initialize
       OGRRegisterAll()
-      @driver = OGRGetDriverByName("ESRI Shapefile")
+      @driver = OGRGetDriverByName("GeoJSON")
     end
   end
 end
