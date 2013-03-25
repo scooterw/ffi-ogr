@@ -13,7 +13,7 @@ module OGR
       @ds
     end
 
-    def self.create_from_file_type(path)
+    def self.from_file_type(path)
       path = File.expand_path(path)
 
       unless File.exists? path
@@ -21,6 +21,8 @@ module OGR
           writer = ShpWriter.new
         elsif path =~ /.geojson|.json/
           writer = GeoJSONWriter.new
+        else
+          raise RuntimeError.new("Could not determine appropriate writer for this file type")
         end
 
         writer.set_output(path)
@@ -31,7 +33,7 @@ module OGR
     end
 
     def export(output_path)
-      writer = Writer.create_from_file_type output_path
+      writer = Writer.from_file_type output_path
       data_source = writer.ds
 
       # @ds -> data_source
