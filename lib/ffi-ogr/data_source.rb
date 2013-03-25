@@ -4,17 +4,20 @@ module OGR
 
     attr_accessor :ds
 
-    def initialize(*args)
-      if args.first.instance_of? FFI::Pointer
-        @ds = FFI::AutoPointer.new(args.first, self.class.method(:release))
-        @ds.autorelease = true
-      else
-        @ds = 'data_source'
-      end
+    def initialize(ptr=nil, auto_free=true)
+      @ds = FFI::AutoPointer.new(ptr, self.class.method(:release))
+      @ds.autorelease = auto_free
     end
 
     def self.release(ptr)
       FFIOGR.OGR_DS_Destroy(ptr)
+    end
+
+    def add_layer(name, geometry_type, spatial_ref=nil, options={})
+      # need to add spatial reference mapping
+      # need to add options as StringList ...
+      layer = FFIOGR.OGR_DS_CreateLayer(@ds, name, spatial_ref, geometry_type.to_sym, nil)
+      OGR::Tools.cast_layer(layer)
     end
 
     def get_layers
@@ -58,18 +61,6 @@ module OGR
     alias_method :fields, :get_fields
 
     def to_geojson(pretty=false)
-      if @ds && @ds.instance_of?(FFI::AutoPointer)
-        ptr_to_geojson(pretty)
-      else
-        ds_to_geojson(pretty)
-      end
-    end
-
-    def ds_to_geojson(pretty=false)
-      @ds
-    end
-
-    def ptr_to_geojson(pretty=false)
       MultiJson.dump({type: 'FeatureCollection', features: features.map {|f| f.to_geojson}}, pretty: pretty)
     end
   end

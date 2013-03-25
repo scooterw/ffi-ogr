@@ -11,6 +11,10 @@ module OGR
       FFIOGR.OGR_F_Destroy(ptr)
     end
 
+    def add_geometry(geometry_type)
+      geometry = FFIOGR.OGR_G_CreateGeometry(geometry_type)
+    end
+
     def get_geometry
       FFIOGR.OGR_F_GetGeometryRef(@ptr)
     end

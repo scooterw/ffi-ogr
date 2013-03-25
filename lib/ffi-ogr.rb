@@ -4,9 +4,16 @@ require 'multi_json'
 module OGR
   OGR_BASE = File.join(File.dirname(__FILE__), 'ffi-ogr')
 
+  autoload :Reader, File.join(OGR_BASE, 'reader')
+  autoload :GenericReader, File.join(OGR_BASE, 'generic_reader')
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
+  autoload :ShpWriter, File.join(OGR_BASE, 'shp_writer')
+  autoload :GeoJSONReader, File.join(OGR_BASE, 'geo_json_reader')
   autoload :DataSource, File.join(OGR_BASE, 'data_source')
+  autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
+  autoload :GeoJSON, File.join(OGR_BASE, 'geo_json')
   autoload :Tools, File.join(OGR_BASE, 'tools')
+  autoload :Layer, File.join(OGR_BASE, 'layer')
   autoload :Feature, File.join(OGR_BASE, 'feature')
   autoload :Geometry, File.join(OGR_BASE, 'geometry')
   autoload :Point, File.join(OGR_BASE, 'point')
@@ -65,23 +72,23 @@ module OGR
     ]
 
     enum :ogr_geometry_type, [
-      :wkb_unknown, 0,
-      :wkb_point, 1,
-      :wkb_line_string, 2,
-      :wkb_polygon, 3,
-      :wkb_multi_point, 4,
-      :wkb_multi_line_string, 5,
-      :wkb_multi_polygon, 6,
-      :wkb_geometry_collection, 7,
-      :wkb_none, 100,
-      :wkb_linear_ring, 101,
-      :wkb_point_25d, 0x80000001,
-      :wkb_line_string_25d, 0x80000002,
-      :wkb_polygon_25d, 0x80000003,
-      :wkb_multi_point_25d, 0x80000004,
-      :wkb_multi_line_string_25d, 0x80000005,
-      :wkb_multi_polygon_25d, 0x80000006,
-      :wkb_geometry_collection_25d, 0x80000007
+      :unknown, 0,
+      :point, 1,
+      :line_string, 2,
+      :polygon, 3,
+      :multi_point, 4,
+      :multi_line_string, 5,
+      :multi_polygon, 6,
+      :geometry_collection, 7,
+      :none, 100,
+      :linear_ring, 101,
+      :point_25d, 0x80000001,
+      :line_string_25d, 0x80000002,
+      :polygon_25d, 0x80000003,
+      :multi_point_25d, 0x80000004,
+      :multi_line_string_25d, 0x80000005,
+      :multi_polygon_25d, 0x80000006,
+      :geometry_collection_25d, 0x80000007
     ]
 
     enum :ogr_justification, [
@@ -115,6 +122,7 @@ module OGR
     attach_function :OGR_DS_ReleaseResultSet, [:pointer, :pointer], :void
     attach_function :OGR_DS_SyncToDisk, [:pointer], :pointer
     attach_function :OGR_L_GetGeomType, [:pointer], :ogr_geometry_type
+    attach_function :OGR_L_GetName, [:pointer], :string
     attach_function :OGR_L_GetSpatialFilter, [:pointer], :pointer
     attach_function :OGR_L_SetSpatialFilter, [:pointer, :pointer], :void
     attach_function :OGR_L_SetSpatialFilterRect, [:pointer, :double, :double, :double, :double], :void
@@ -130,6 +138,7 @@ module OGR
     attach_function :OGR_L_GetSpatialRef, [:pointer], :pointer
     attach_function :OGR_L_GetFeatureCount, [:pointer, :int], :int
     attach_function :OGR_L_GetExtent, [:pointer, :pointer, :int], :pointer
+    attach_function :OGR_L_CreateField, [:pointer, :pointer, :int], :pointer
     attach_function :OGR_FD_GetFieldCount, [:pointer], :int
     attach_function :OGR_FD_GetFieldDefn, [:pointer, :int], :pointer
     attach_function :OGR_Fld_Create, [:string, :ogr_field_type], :pointer
@@ -147,14 +156,24 @@ module OGR
     attach_function :OGR_Fld_Set, [:pointer, :string, :ogr_field_type, :int, :int, :ogr_justification], :void
     attach_function :OGR_Fld_IsIgnored, [:pointer], :int
     attach_function :OGR_Fld_SetIgnored, [:pointer, :int], :void
+    attach_function :OGR_F_Create, [:pointer], :pointer
     attach_function :OGR_F_GetFieldAsInteger, [:pointer, :int], :int
     attach_function :OGR_F_GetFieldAsDouble, [:pointer, :int], :double
     attach_function :OGR_F_GetFieldAsString, [:pointer, :int], :string
-    #attach_function :OGR_F_GetFieldAsIntegerList, [:pointer, :int, :pointer], :pointer
-    #attach_function :OGR_F_GetFieldAsDoubleList, [:pointer, :int, :pointer], :pointer
-    #attach_function :OGR_F_GetFieldAsStringList, [:pointer, :int], :pointer
-    #attach_function :OGR_F_GetFieldAsBinary, [:pointer, :int, :pointer], :pointer
-    #attach_function :OGR_F_GetFieldAsDateTime, [:pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :pointer
+    attach_function :OGR_F_GetFieldAsIntegerList, [:pointer, :int, :pointer], :pointer
+    attach_function :OGR_F_GetFieldAsDoubleList, [:pointer, :int, :pointer], :pointer
+    attach_function :OGR_F_GetFieldAsStringList, [:pointer, :int], :pointer
+    attach_function :OGR_F_GetFieldAsBinary, [:pointer, :int, :pointer], :pointer
+    attach_function :OGR_F_GetFieldAsDateTime, [:pointer, :int, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer, :pointer], :pointer
+    attach_function :OGR_F_SetFieldInteger, [:pointer, :int, :int], :void
+    attach_function :OGR_F_SetFieldDouble, [:pointer, :int, :double], :void
+    attach_function :OGR_F_SetFieldString, [:pointer, :int, :string], :void
+    attach_function :OGR_F_SetFieldIntegerList, [:pointer, :int, :int, :pointer], :void
+    attach_function :OGR_F_SetFieldDoubleList, [:pointer, :int, :int, :pointer], :void
+    attach_function :OGR_F_SetFieldStringList, [:pointer, :int, :int, :pointer], :void
+    attach_function :OGR_F_SetFieldRaw, [:pointer, :int, :pointer], :void
+    attach_function :OGR_F_SetFieldBinary, [:pointer, :int, :int, :pointer], :void
+    attach_function :OGR_F_SetFieldDateTime, [:pointer, :int, :int, :int, :int, :int, :int, :int, :int], :void
     attach_function :OGR_F_GetDefnRef, [:pointer], :pointer
     attach_function :OGR_F_GetFieldCount, [:pointer], :int
     attach_function :OGR_F_GetFieldDefnRef, [:pointer, :int], :pointer
@@ -182,7 +201,7 @@ module OGR
     attach_function :OGR_G_ImportFromWkb, [:pointer, :pointer, :int], :pointer
     attach_function :OGR_G_ExportToWkb, [:pointer, :pointer, :pointer], :pointer
     attach_function :OGR_G_WkbSize, [:pointer], :int
-    attach_function :OGR_G_ImportFromWkt, [:pointer, :pointer], :pointer
+    attach_function :OGR_G_ImportFromWkt, [:pointer, :string], :pointer
     attach_function :OGR_G_ExportToWkt, [:pointer, :pointer], :pointer
     attach_function :OGR_G_GetGeometryType, [:pointer], :ogr_geometry_type
     attach_function :OGR_G_GetGeometryName, [:pointer], :string

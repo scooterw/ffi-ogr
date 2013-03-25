@@ -9,6 +9,10 @@ module OGR
 
     def self.release(ptr);end
 
+    def flatten
+      FFIOGR.OGR_G_FlattenTo2D(@ptr)
+    end
+
     def geom_type
       FFIOGR.OGR_G_GetGeometryType(@ptr)
     end

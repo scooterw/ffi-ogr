@@ -7,6 +7,12 @@ module OGR
         DataSource.new ds_ptr, options[:auto_free]
       end
 
+      def cast_layer(l_ptr, options={})
+        options = {auto_free: true}.merge(options)
+        raise RuntimeError.new("Layer pointer is NULL") if l_ptr.null?
+        Layer.new l_ptr, options[:aut_free]
+      end
+
       def cast_feature(f_ptr, options={})
         options = {auto_free: true}.merge(options)
         raise RuntimeError.new("Feature pointer is NULL") if f_ptr.null?
@@ -20,17 +26,17 @@ module OGR
         geom_type = FFIOGR.OGR_G_GetGeometryType(geom_ptr)
 
         klass = case geom_type
-        when :wkb_point
+        when :point
           OGR::Point
-        when :wkb_line_string
+        when :line_string
           OGR::LineString
-        when :wkb_polygon
+        when :polygon
           OGR::Polygon
-        when :wkb_multi_point
+        when :multi_point
           OGR::MultiPoint
-        when :wkb_multi_line_string
+        when :multi_line_string
           OGR::MultiLineString
-        when :wkb_multi_polygon
+        when :multi_polygon
           OGR::MultiPolygon
         end
 
