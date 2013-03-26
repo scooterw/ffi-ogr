@@ -1,7 +1,7 @@
 module OGR
-  class MultiPoint < Geometry
+  class MultiPoint25D < Geometry
     def self.create(points)
-      multi_point = OGR::Tools.cast_geometry(FFIOGR.OGR_G_CreateGeometry(:multi_point))
+      multi_point = OGR::Tools.cast_geometry(FFIOGR.OGR_G_CreateGeometry(:multi_point_25d))
 
       points.each do |point|
         pt = OGR::Point.create(point)

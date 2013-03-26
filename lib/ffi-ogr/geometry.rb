@@ -9,13 +9,49 @@ module OGR
 
     def self.release(ptr);end
 
+    def self.create_empty(geometry_type)
+      OGR::Tools.cast_geometry(FFIOGR.OGR_G_CreateGeometry(geometry_type))
+    end
+
+    def add_geometry(geometry)
+      FFIOGR.OGR_G_AddGeometry(@ptr, geometry)
+      #FFIOGR.OGR_G_AddGeometryDirectly(@ptr, geometry)
+    end
+
+    def add_point(coords)
+      raise RuntimeError.new("Invalid coordinate(s) specified") unless coords.size >= 2
+      x = Float(coords[0])
+      y = Float(coords[1])
+      z = Float(coords[2]) if coords.size >= 3
+
+      unless z
+        FFIOGR.OGR_G_AddPoint_2D(@ptr, x, y)
+      else
+        FFIOGR.OGR_G_AddPoint(@ptr, x, y, z)
+      end
+    end
+
+    def set_point(coords, idx)
+      raise RuntimeError.new("Invalid coordinate(s) specified") unless coords.size >= 2
+      x = Float(coords[0])
+      y = Float(coords[1])
+      z = Float(coords[2]) if coords.size >= 3
+
+      unless z
+        FFIOGR.OGR_G_SetPoint_2D(@ptr, idx, x, y)
+      else
+        FFIOGR.OGR_G_SetPoint(@ptr, idx, x, y, z)
+      end
+    end
+
     def flatten
       FFIOGR.OGR_G_FlattenTo2D(@ptr)
     end
 
-    def geom_type
+    def get_geometry_type
       FFIOGR.OGR_G_GetGeometryType(@ptr)
     end
+    alias_method :geometry_type, :get_geometry_type
 
     def get_length
       FFIOGR.OGR_G_Length(@ptr)

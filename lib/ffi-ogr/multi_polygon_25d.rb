@@ -1,7 +1,7 @@
 module OGR
-  class MultiPolygon < Geometry
+  class MultiPolygon25D < Geometry
     def self.create(polygons)
-      multi_polygon = OGR::Tools.cast_geometry(FFIOGR.OGR_G_CreateGeometry(:multi_polygon))
+      multi_polygon = OGR::Tools.cast_geometry(FFIOGR.OGR_G_CreateGeometry(:multi_polygon_25d))
 
       polygons.each do |polygon|
         poly = OGR::Polygon.create(polygon)

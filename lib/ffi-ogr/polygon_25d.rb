@@ -1,7 +1,7 @@
 module OGR
-  class Polygon < Geometry
+  class Polygon25D < Geometry
     def self.create(rings)
-      polygon = OGR::Tools.cast_geometry(FFIOGR.OGR_G_CreateGeometry(:polygon))
+      polygon = OGR::Tools.cast_geometry(FFIOGR.OGR_G_CreateGeometry(:polygon_25d))
 
       rings.each do |ring|
         lr = LinearRing.create(ring)

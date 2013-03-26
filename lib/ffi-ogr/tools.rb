@@ -38,6 +38,24 @@ module OGR
           OGR::MultiLineString
         when :multi_polygon
           OGR::MultiPolygon
+        when :geometry_collection
+          OGR::GeometryCollection
+        when :linear_ring
+          OGR::LinearRing
+        when :point_25d
+          OGR::Point25D
+        when :line_string_25d
+          OGR::LineString25D
+        when :polygon_25d
+          OGR::Polygon25D
+        when :multi_point_25d
+          OGR::MultiPoint25D
+        when :multi_line_string_25d
+          OGR::MultiLineString25D
+        when :multi_polygon_25d
+          OGR::MultiPolygon25D
+        when :geometry_collection_25d
+          OGR::GeometryCollection25D
         end
 
         klass.new(geom_ptr, options[:auto_free])

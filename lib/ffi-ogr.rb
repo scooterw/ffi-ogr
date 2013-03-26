@@ -22,6 +22,15 @@ module OGR
   autoload :MultiPoint, File.join(OGR_BASE, 'multi_point')
   autoload :MultiLineString, File.join(OGR_BASE, 'multi_line_string')
   autoload :MultiPolygon, File.join(OGR_BASE, 'multi_polygon')
+  autoload :GeometryCollection, File.join(OGR_BASE, 'geometry_collection')
+  autoload :LinearRing, File.join(OGR_BASE, 'linear_ring')
+  autoload :Point25D, File.join(OGR_BASE, 'point_25d')
+  autoload :LineString25D, File.join(OGR_BASE, 'line_string_25d')
+  autoload :Polygon25D, File.join(OGR_BASE, 'polygon_25d')
+  autoload :MultiPoint25D, File.join(OGR_BASE, 'multi_point_25d')
+  autoload :MultiLineString25D, File.join(OGR_BASE, 'multi_line_string_25d')
+  autoload :MultiPolygon25D, File.join(OGR_BASE, 'multi_polygon_25d')
+  autoload :GeometryCollection25D, File.join(OGR_BASE, 'geometry_collection_25d')
 
   module FFIOGR
     def self.search_paths
@@ -268,13 +277,3 @@ module OGR
 
   class << self;end
 end
-
-
-
-
-
-
-
-
-
-

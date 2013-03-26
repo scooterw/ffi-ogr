@@ -11,70 +11,6 @@ module OGR
       FFIOGR.OGR_F_Destroy(ptr)
     end
 
-    def add_geometry(geometry_type, wkt_geometry=nil)
-      geometry_type = geometry_type.to_sym
-      geometry = nil
-
-      if wkt_geometry
-        if wkt_geometry.instance_of?(String)
-          geometry = FFIOGR.OGR_G_CreateGeometry(geometry_type)
-          FFIOGR.OGR_G_CreateFromWkt(wkt_geometry, nil, geometry, -1) # verify -1 acceptability
-        end
-      else
-        case geometry_type
-        when :point
-          geometry = create_point(wkt_geometry)
-        when :line_string
-          geometry = create_line_string(wkt_geometry)
-        when :polygon
-          geometry = create_polygon(wkt_geometry)
-        end
-      end
-
-      FFIOGR.OGR_F_SetGeometry(@ptr, geometry)
-      FFIOGR.OGR_G_DestroyGeometry(geometry)
-    end
-
-    def create_point(geometry)
-      x = Float(g[0])
-      y = Float(g[1])
-      z = Float(g[2]) if g.size == 3
-
-      point = FFIOGR.OGR_G_CreateGeometry(:point)
-      unless z
-        FFIOGR.OGR_G_SetPoint_2D(point, 0, x, y)
-      else
-        FFIOGR.OGR_G_SetPoint(point, 0, x, y, z)
-      end
-
-      point
-    end
-
-    def create_line_string(geometry)
-      ls = FFIOGR.OGR_G_CreateGeometry(:line_string)
-
-      geometry.each_index do |i|
-        g = geometry[i]
-        x = Float(g[0])
-        y = Float(g[1])
-        z = Float(g[2]) if g.size == 3
-
-        unless z
-          FFIOGR.OGR_G_SetPoint_2D(ls, i, x, y)
-        else
-          FFIOGR.OGR_G_SetPoint(ls, i, x, y, z)
-        end
-      end
-
-      ls
-    end
-
-    # MUST HANDLE POLYGONS WITH HOLES
-    # MUST HANDLE MULTI* GEOMETRIES
-    def create_polygon(geometry)
-      FFIOGR.OGR_G_ForceToPolygon(create_line_string(geometry))
-    end
-
     def set_field_value(name, value, field_type=nil)
       field_index = FFIOGR.OGR_F_GetFieldIndex(@ptr, name)
 
@@ -96,6 +32,8 @@ module OGR
         FFIOGR.OGR_F_SetFieldBinary(@ptr, field_index, value) # check this
       end
     end
+
+    def add_geometry;end
 
     def get_geometry
       FFIOGR.OGR_F_GetGeometryRef(@ptr)
