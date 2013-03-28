@@ -7,8 +7,11 @@ module OGR
   autoload :Reader, File.join(OGR_BASE, 'reader')
   autoload :GenericReader, File.join(OGR_BASE, 'generic_reader')
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
-  autoload :ShpWriter, File.join(OGR_BASE, 'shp_writer')
   autoload :GeoJSONReader, File.join(OGR_BASE, 'geo_json_reader')
+  autoload :Writer, File.join(OGR_BASE, 'writer')
+  autoload :GenericWriter, File.join(OGR_BASE, 'generic_writer')
+  autoload :ShpWriter, File.join(OGR_BASE, 'shp_writer')
+  autoload :GeoJSONWriter, File.join(OGR_BASE, 'geo_json_writer')
   autoload :DataSource, File.join(OGR_BASE, 'data_source')
   autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
   autoload :GeoJSON, File.join(OGR_BASE, 'geo_json')
@@ -148,6 +151,7 @@ module OGR
     attach_function :OGR_L_GetFeatureCount, [:pointer, :int], :int
     attach_function :OGR_L_GetExtent, [:pointer, :pointer, :int], :pointer
     attach_function :OGR_L_CreateField, [:pointer, :pointer, :int], :pointer
+    attach_function :OGR_L_SyncToDisk, [:pointer], :pointer
     attach_function :OGR_FD_GetFieldCount, [:pointer], :int
     attach_function :OGR_FD_GetFieldDefn, [:pointer, :int], :pointer
     attach_function :OGR_Fld_Create, [:string, :ogr_field_type], :pointer
@@ -191,6 +195,8 @@ module OGR
     attach_function :OGR_F_GetGeometryRef, [:pointer], :pointer
     attach_function :OGR_F_GetFID, [:pointer], :long
     attach_function :OGR_F_SetFID, [:pointer, :long], :pointer
+    attach_function :OGR_F_SetGeometry, [:pointer, :pointer], :pointer
+    attach_function :OGR_F_SetGeometryDirectly, [:pointer, :pointer], :pointer
     attach_function :OGR_G_CreateFromWkb, [:pointer, :pointer, :pointer, :int], :pointer
     attach_function :OGR_G_CreateFromWkt, [:pointer, :pointer, :pointer], :pointer
     attach_function :OGR_G_DestroyGeometry, [:pointer], :void
@@ -275,5 +281,11 @@ module OGR
     attach_function :OGR_F_Destroy, [:pointer], :void
   end
 
-  class << self;end
+  class << self
+    def to_binary(data)
+      buf = FFI::MemoryPointer.new(:char, value.size)
+      buf.put_bytes(0, data)
+      buf
+    end
+  end
 end

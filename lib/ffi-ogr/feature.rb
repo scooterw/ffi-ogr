@@ -15,10 +15,10 @@ module OGR
       field_index = FFIOGR.OGR_F_GetFieldIndex(@ptr, name)
 
       unless field_type.nil?
+        field_type = field_type.to_sym
+      else
         field_definition = FFIOGR.OGR_F_GetFieldDefnRef(@ptr, field_index)
         field_type = FFIOGR.OGR_Fld_GetType(field_definition)
-      else
-        field_type = field_type.to_sym
       end
 
       case field_type
@@ -29,11 +29,14 @@ module OGR
       when :string
         FFIOGR.OGR_F_SetFieldString(@ptr, field_index, String(value))
       when :binary
-        FFIOGR.OGR_F_SetFieldBinary(@ptr, field_index, value) # check this
+        FFIOGR.OGR_F_SetFieldBinary(@ptr, field_index, to_binary(value))
       end
     end
 
-    def add_geometry;end
+    def add_geometry(geometry)
+      FFIOGR.OGR_F_SetGeometry(@ptr, geometry.ptr)
+      #FFIOGR.OGR_F_SetGeometryDirectly(@ptr, geometry.ptr)
+    end
 
     def get_geometry
       FFIOGR.OGR_F_GetGeometryRef(@ptr)

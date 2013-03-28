@@ -14,8 +14,8 @@ module OGR
     end
 
     def add_geometry(geometry)
-      FFIOGR.OGR_G_AddGeometry(@ptr, geometry)
-      #FFIOGR.OGR_G_AddGeometryDirectly(@ptr, geometry)
+      FFIOGR.OGR_G_AddGeometry(@ptr, geometry.ptr)
+      #FFIOGR.OGR_G_AddGeometryDirectly(@ptr, geometry.ptr)
     end
 
     def add_point(coords)

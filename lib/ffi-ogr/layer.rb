@@ -11,6 +11,10 @@ module OGR
 
     def self.release(ptr);end
 
+    def sync
+      FFIOGR.OGR_L_SyncToDisk(@ptr)
+    end
+
     def add_field(name, field_type, field_width=32)
       field = FFIOGR.OGR_Fld_Create(name, field_type.to_sym)
       FFIOGR.OGR_Fld_SetWidth(field, field_width)
@@ -24,7 +28,7 @@ module OGR
     end
 
     def add_feature(feature)
-      FFIOGR.OGR_L_CreateFeature(@ptr, feature)
+      FFIOGR.OGR_L_CreateFeature(@ptr, feature.ptr)
     end
 
     def get_features
