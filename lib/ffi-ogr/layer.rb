@@ -15,6 +15,11 @@ module OGR
       FFIOGR.OGR_L_SyncToDisk(@ptr)
     end
 
+    def get_spatial_ref
+      OGR::Tools.cast_spatial_reference(FFIOGR.OGR_L_GetSpatialRef(@ptr))
+    end
+    alias_method :spatial_ref, :get_spatial_ref
+
     def add_field(name, field_type, field_width=32)
       field = FFIOGR.OGR_Fld_Create(name, field_type.to_sym)
       FFIOGR.OGR_Fld_SetWidth(field, field_width)

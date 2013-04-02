@@ -53,6 +53,17 @@ module OGR
     end
     alias_method :geometry_type, :get_geometry_type
 
+    def get_spatial_ref
+      OGR::Tools.cast_spatial_reference(FFIOGR.OGR_G_GetSpatialReference(@ptr))
+    end
+    alias_method :spatial_ref, :get_spatial_ref
+
+    def transform(out_sr)
+      in_sr = spatial_ref.ptr
+      xform = FFIOGR.OSRNewCoordinateTransformation(in_sr, out_sr)
+      FFIOGR.OGR_G_Transform(@ptr, xform)
+    end
+
     def get_length
       FFIOGR.OGR_G_Length(@ptr)
     end

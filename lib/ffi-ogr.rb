@@ -34,6 +34,7 @@ module OGR
   autoload :MultiLineString25D, File.join(OGR_BASE, 'multi_line_string_25d')
   autoload :MultiPolygon25D, File.join(OGR_BASE, 'multi_polygon_25d')
   autoload :GeometryCollection25D, File.join(OGR_BASE, 'geometry_collection_25d')
+  autoload :SpatialReference, File.join(OGR_BASE, 'spatial_reference')
 
   module FFIOGR
     def self.search_paths
@@ -279,6 +280,19 @@ module OGR
     attach_function :OGR_G_AddGeometryDirectly, [:pointer, :pointer], :pointer
     attach_function :OGR_G_RemoveGeometry, [:pointer, :int, :int], :pointer
     attach_function :OGR_F_Destroy, [:pointer], :void
+
+    # SRS Functions
+
+    attach_function :OSRNewSpatialReference, [:pointer], :pointer
+    attach_function :OSRImportFromWkt, [:pointer, :string], :pointer
+    attach_function :OSRImportFromProj4, [:pointer, :string], :pointer
+    attach_function :OSRImportFromEPSG, [:pointer, :int], :pointer
+    attach_function :OSRExportToWkt, [:pointer, :pointer], :pointer
+    attach_function :OSRExportToPrettyWkt, [:pointer, :pointer, :int], :pointer
+    attach_function :OSRExportToProj4, [:pointer, :pointer], :pointer
+    attach_function :OSRDestroySpatialReference, [:pointer], :void
+    attach_function :OCTNewCoordinateTransformation, [:pointer, :pointer], :pointer
+    attach_function :OCTDestroyCoordinateTransformation, [:pointer], :void
   end
 
   class << self
@@ -286,6 +300,10 @@ module OGR
       buf = FFI::MemoryPointer.new(:char, value.size)
       buf.put_bytes(0, data)
       buf
+    end
+
+    def string_to_pointer(str)
+      FFI::MemoryPointer.from_string(str)
     end
   end
 end
