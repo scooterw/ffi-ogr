@@ -8,7 +8,7 @@ module OGR
     end
 
     def self.release(ptr)
-      FFIOGR.OSRDestroySpatialReference(@ptr)
+      FFIOGR.OSRDestroySpatialReference(ptr)
     end
 
     def self.create
@@ -47,6 +47,7 @@ module OGR
 
     def to_wkt(pretty=false)
       ptr = FFI::MemoryPointer.new :pointer
+
       unless pretty
         FFIOGR.OSRExportToWkt(@ptr, ptr)
       else
@@ -64,22 +65,8 @@ module OGR
       return str_ptr.null? ? nil: str_ptr.read_string
     end
 
-    def get_coordinate_transformation(out_sr)
-      if out_sr.instance_of? Integer
-        out_sr = OGR::SpatialReference.from_epsg out_sr
-      elsif out_sr.instance_of? String
-        begin
-          out_sr = OGR::SpatialReference.from_wkt out_sr
-        rescue
-          out_sr = OGR::SpatialReference.from_proj4 out_sr
-        end
-      end
-
-      if out_sr.instance_of? OGR::SpatialReference
-        FFIOGR.OSRNewCoordinateTransformation(@ptr, out_sr.ptr)
-      else
-        raise RuntimeError.new("Could not obtain spatial reference information")
-      end
+    def find_transformation(out_sr)
+      CoordinateTransformation.find_transformation self, out_sr
     end
   end
 end

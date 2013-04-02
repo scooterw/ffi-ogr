@@ -35,6 +35,7 @@ module OGR
   autoload :MultiPolygon25D, File.join(OGR_BASE, 'multi_polygon_25d')
   autoload :GeometryCollection25D, File.join(OGR_BASE, 'geometry_collection_25d')
   autoload :SpatialReference, File.join(OGR_BASE, 'spatial_reference')
+  autoload :CoordinateTransformation, File.join(OGR_BASE, 'coordinate_transformation')
 
   module FFIOGR
     def self.search_paths
