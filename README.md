@@ -7,7 +7,7 @@ To read a shapefile:
 
 ```ruby
 shp = OGR::ShpReader.new.read './spec/data/ne_110m_coastline/ne_110m_coastline.shp'
-# => #<OGR::DataSource:0x007fba4d19c328 @ds=#<FFI::AutoPointer address=0x007fba4c4cdc50>>
+# => #<OGR::DataSource:0x007fba4d19c328 @ptr=#<FFI::AutoPointer address=0x007fba4c4cdc50>>
 
 shp.to_geojson '~/Desktop/output.geojson'
 # => Output GeoJSON to specified file
@@ -17,7 +17,7 @@ To reproject a shapefile:
 
 ```ruby
 shp = OGR::ShpReader.new.read './spec/data/ne_110m_coastline/ne_110m_coastline.shp'
-# => #<OGR::DataSource:0x007fba4d19c328 @ds=#<FFI::AutoPointer address=0x007fba4c4cdc50>>
+# => #<OGR::DataSource:0x007fba4d19c328 @ptr=#<FFI::AutoPointer address=0x007fba4c4cdc50>>
 
 shp.to_json
 # => Output GeoJSON string
@@ -45,7 +45,7 @@ To create a shapefile:
 writer = OGR::ShpWriter.new
 writer.set_output '~/Documents/shapefiles/my_new.shp'
 
-shp = writer.ds
+shp = writer.ptr
 
 # add layer to shp : add_layer(name, geometry_type, spatial_reference)
 # currently does not handle spatial reference, will automatically be nil
