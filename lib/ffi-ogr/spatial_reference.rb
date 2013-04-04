@@ -73,6 +73,10 @@ module OGR
       return str_ptr.null? ? nil: str_ptr.read_string
     end
 
+    def ==(other)
+      self.to_wkt == other.to_wkt
+    end
+
     def find_transformation(out_sr)
       CoordinateTransformation.find_transformation self, out_sr
     end

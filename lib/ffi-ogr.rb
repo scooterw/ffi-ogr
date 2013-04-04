@@ -39,6 +39,7 @@ module OGR
   autoload :MultiLineString25D, File.join(OGR_BASE, 'multi_line_string_25d')
   autoload :MultiPolygon25D, File.join(OGR_BASE, 'multi_polygon_25d')
   autoload :GeometryCollection25D, File.join(OGR_BASE, 'geometry_collection_25d')
+  autoload :Envelope, File.join(OGR_BASE, 'envelope')
   autoload :SpatialReference, File.join(OGR_BASE, 'spatial_reference')
   autoload :CoordinateTransformation, File.join(OGR_BASE, 'coordinate_transformation')
 

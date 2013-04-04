@@ -16,7 +16,7 @@ module OGR
 
     def self.from_geojson(geojson)
       if geojson.instance_of? String
-        geojson = MultiJson.load(geojson, symbolize_keys: true)
+        geojson = MultiJson.load(geojson)
       end
 
       coords = geojson['coordinates']
@@ -83,12 +83,6 @@ module OGR
     end
     alias_method :spatial_ref, :get_spatial_ref
 
-    #def transform(out_sr, in_sr=nil)
-    #  in_sr ||= spatial_ref
-    #  xform = OGR::Tools.cast_coordinate_transformation(OGR::CoordinateTransformation.find_transformation(in_sr, out_sr))
-    #  FFIOGR.OGR_G_Transform(@ptr, xform.ptr)
-    #end
-
     def transform(ct)
       FFIOGR.OGR_G_Transform(@ptr, ct)
     end
@@ -107,6 +101,13 @@ module OGR
       FFIOGR.OGR_G_Boundary(@ptr)
     end
     alias_method :boundary, :get_boundary
+
+    def get_envelope
+      envelope = FFI::MemoryPointer.new :pointer, 4
+      FFIOGR.OGR_G_GetEnvelope(@ptr, envelope)
+      OGR::Envelope.new(envelope.read_array_of_double(4))
+    end
+    alias_method :envelope, :get_envelope
 
     def to_geojson
       MultiJson.load(FFIOGR.OGR_G_ExportToJson(@ptr))

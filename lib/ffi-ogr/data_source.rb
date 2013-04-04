@@ -54,7 +54,7 @@ module OGR
         geometry_type = layer.geometry_type
         old_sr = layer.spatial_ref
 
-        ct = OGR::CoordinateTransformation.find_transformation(old_sr, spatial_ref) unless spatial_ref.nil? || (spatial_ref.to_wkt == old_sr.to_wkt)
+        ct = OGR::CoordinateTransformation.find_transformation(old_sr, spatial_ref) unless spatial_ref.nil? || (spatial_ref == old_sr)
 
         sr = spatial_ref.nil? ? nil : spatial_ref.ptr
         new_layer = out.add_layer name, geometry_type, sr
@@ -159,10 +159,12 @@ module OGR
     def to_json(pretty=false)
       h = {
         type: 'FeatureCollection',
+        bbox: nil,
         features: []
       }
 
       layers.each do |layer|
+        h[:bbox] = layer.envelope.to_a true
         geometry_type = layer.geometry_type.to_s.capitalize
 
         layer.features.each do |feature|

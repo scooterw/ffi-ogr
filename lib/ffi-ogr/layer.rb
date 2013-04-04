@@ -18,6 +18,13 @@ module OGR
       FFIOGR.OGR_L_SyncToDisk(@ptr)
     end
 
+    def get_envelope
+      envelope = FFI::MemoryPointer.new :pointer, 4
+      FFIOGR.OGR_L_GetExtent(@ptr, envelope, 0)
+      OGR::Envelope.new(envelope.read_array_of_double(4))
+    end
+    alias_method :envelope, :get_envelope
+
     def get_name
       FFIOGR.OGR_L_GetName(@ptr)
     end
