@@ -21,11 +21,6 @@ module OGR
         Layer.new l_ptr
       end
 
-      def cast_envelope(env_ptr, auto_free=true)
-        raise RuntimeError.new("Envelope pointer is NULL") if env_ptr.null?
-        Envelope.new env_ptr
-      end
-
       def cast_feature(f_ptr, auto_free=true)
         raise RuntimeError.new("Feature pointer is NULL") if f_ptr.null?
         Feature.new f_ptr
