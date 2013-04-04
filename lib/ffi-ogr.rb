@@ -4,6 +4,11 @@ require 'multi_json'
 module OGR
   OGR_BASE = File.join(File.dirname(__FILE__), 'ffi-ogr')
 
+  DRIVER_TYPES = {
+    'shapefile' => 'ESRI Shapefile',
+    'geojson' => 'GeoJSON'
+  }
+
   autoload :Reader, File.join(OGR_BASE, 'reader')
   autoload :GenericReader, File.join(OGR_BASE, 'generic_reader')
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
@@ -110,6 +115,8 @@ module OGR
       :left, 1,
       :right, 2
     ]
+
+    attach_function :GDALVersionInfo, [:string], :string
 
     attach_function :OGRRegisterAll, [], :void
     attach_function :OGR_Dr_GetName, [:pointer], :string
@@ -297,6 +304,10 @@ module OGR
   end
 
   class << self
+    def gdal_version
+      FFIOGR.GDALVersionInfo('RELEASE_NAME')
+    end
+
     def to_binary(data)
       buf = FFI::MemoryPointer.new(:char, value.size)
       buf.put_bytes(0, data)

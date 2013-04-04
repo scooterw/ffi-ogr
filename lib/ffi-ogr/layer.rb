@@ -2,18 +2,31 @@ module OGR
   class Layer
     attr_accessor :ptr, :name, :geometry_type
 
-    def initialize(ptr, auto_free=true)
+    def initialize(ptr)
       @ptr = FFI::AutoPointer.new(ptr, self.class.method(:release))
-      @name = FFIOGR.OGR_L_GetName(@ptr)
-      @geometry_type = FFIOGR.OGR_L_GetGeomType(@ptr)
-      #@ptr.autorelease = auto_free
+      #@ptr = FFI::AutoPointer.new(ptr)
+      @ptr.autorelease = false
     end
 
     def self.release(ptr);end
 
+    def free
+      @ptr.free
+    end
+
     def sync
       FFIOGR.OGR_L_SyncToDisk(@ptr)
     end
+
+    def get_name
+      FFIOGR.OGR_L_GetName(@ptr)
+    end
+    alias_method :name, :get_name
+
+    def get_geometry_type
+      FFIOGR.OGR_L_GetGeomType(@ptr)
+    end
+    alias_method :geometry_type, :get_geometry_type
 
     def get_spatial_ref
       OGR::Tools.cast_spatial_reference(FFIOGR.OGR_L_GetSpatialRef(@ptr))

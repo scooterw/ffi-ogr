@@ -1,13 +1,35 @@
 module OGR
   class Geometry
-    attr_reader :ptr
+    attr_accessor :ptr
 
-    def initialize(ptr, auto_free=true)
+    def initialize(ptr)
       @ptr = FFI::AutoPointer.new(ptr, self.class.method(:release))
-      #@ptr.autorelease = auto_free
+      #@ptr = FFI::AutoPointer.new(ptr)
+      @ptr.autorelease = false
     end
 
     def self.release(ptr);end
+
+    def free
+      FFIOGR.OGR_G_DestroyGeometry(@ptr)
+    end
+
+    def self.from_geojson(geojson)
+      if geojson.instance_of? String
+        geojson = MultiJson.load(geojson, symbolize_keys: true)
+      end
+
+      coords = geojson['coordinates']
+
+      case geojson['type']
+      when 'Point'
+        OGR::Point.create coords
+      when 'LineString'
+        OGR::LineString.create coords
+      when 'Polygon'
+        OGR::Polygon.create coords
+      end
+    end
 
     def self.create_empty(geometry_type)
       OGR::Tools.cast_geometry(FFIOGR.OGR_G_CreateGeometry(geometry_type))
@@ -15,7 +37,10 @@ module OGR
 
     def add_geometry(geometry)
       FFIOGR.OGR_G_AddGeometry(@ptr, geometry.ptr)
-      #FFIOGR.OGR_G_AddGeometryDirectly(@ptr, geometry.ptr)
+    end
+
+    def add_geometry_directly(geometry)
+      FFIOGR.OGR_G_AddGeometryDirectly(@ptr, geometry.ptr)
     end
 
     def add_point(coords)
@@ -58,10 +83,14 @@ module OGR
     end
     alias_method :spatial_ref, :get_spatial_ref
 
-    def transform(out_sr)
-      in_sr = spatial_ref.ptr
-      xform = FFIOGR.OSRNewCoordinateTransformation(in_sr, out_sr)
-      FFIOGR.OGR_G_Transform(@ptr, xform)
+    #def transform(out_sr, in_sr=nil)
+    #  in_sr ||= spatial_ref
+    #  xform = OGR::Tools.cast_coordinate_transformation(OGR::CoordinateTransformation.find_transformation(in_sr, out_sr))
+    #  FFIOGR.OGR_G_Transform(@ptr, xform.ptr)
+    #end
+
+    def transform(ct)
+      FFIOGR.OGR_G_Transform(@ptr, ct)
     end
 
     def get_length

@@ -2,13 +2,15 @@ module OGR
   class CoordinateTransformation
     attr_accessor :ptr
 
-    def initialize(ptr, auto_free=true)
+    def initialize(ptr)
       @ptr = FFI::AutoPointer.new(ptr, self.class.method(:release))
-      @ptr.autorelease = auto_free
+      @ptr.autorelease = false
     end
 
-    def self.release(ptr)
-      FFIOGR.OCTDestroyCoordinateTransformation(ptr)
+    def self.release(ptr);end
+
+    def free
+      FFIOGR.OCTDestroyCoordinateTransformation(@ptr)
     end
 
     def self.find_transformation(in_sr, out_sr)

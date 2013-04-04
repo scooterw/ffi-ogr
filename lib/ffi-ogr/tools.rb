@@ -3,27 +3,27 @@ module OGR
     class << self
       def cast_spatial_reference(sr_ptr, auto_free=true)
         raise RuntimeError.new("Spatial Reference pointer is NULL") if sr_ptr.null?
-        SpatialReference.new sr_ptr, auto_free
+        SpatialReference.new sr_ptr
       end
 
-      def cast_coordinate_transform(ct_ptr, auto_free=true)
-        raise RuntimeError.new("Coordinate Transform pointer is NULL") if ct_ptr.null?
-        CoordinateTransform.new ct_ptr, auto_free
+      def cast_coordinate_transformation(ct_ptr, auto_free=true)
+        raise RuntimeError.new("Coordinate Transformation pointer is NULL") if ct_ptr.null?
+        CoordinateTransformation.new ct_ptr
       end
 
       def cast_data_source(ds_ptr, auto_free=true)
         raise RuntimeError.new("Data Source pointer is NULL") if ds_ptr.null?
-        DataSource.new ds_ptr, auto_free
+        DataSource.new ds_ptr
       end
 
       def cast_layer(l_ptr, auto_free=true)
         raise RuntimeError.new("Layer pointer is NULL") if l_ptr.null?
-        Layer.new l_ptr, auto_free
+        Layer.new l_ptr
       end
 
       def cast_feature(f_ptr, auto_free=true)
         raise RuntimeError.new("Feature pointer is NULL") if f_ptr.null?
-        Feature.new f_ptr, auto_free
+        Feature.new f_ptr
       end
 
       def cast_geometry(geom_ptr, auto_free=true)
@@ -65,7 +65,7 @@ module OGR
           OGR::GeometryCollection25D
         end
 
-        klass.new(geom_ptr, auto_free)
+        klass.new(geom_ptr)
       end
     end
   end

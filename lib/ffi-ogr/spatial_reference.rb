@@ -2,13 +2,21 @@ module OGR
   class SpatialReference
     attr_accessor :ptr
 
-    def initialize(ptr, auto_free=true)
+    def initialize(ptr)
       @ptr = FFI::AutoPointer.new(ptr, self.class.method(:release))
-      @ptr.autorelease = auto_free
+      @ptr.autorelease = false
     end
 
-    def self.release(ptr)
-      FFIOGR.OSRDestroySpatialReference(ptr)
+    #def self.release(ptr)
+      # this causes an error on exit
+      # should manually release these
+      #FFIOGR.OSRDestroySpatialReference(ptr)
+    #end
+
+    def self.release(ptr);end
+
+    def free
+      FFIOGR.OSRDestroySpatialReference(@ptr)
     end
 
     def self.create

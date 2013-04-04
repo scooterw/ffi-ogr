@@ -2,15 +2,15 @@ module OGR
   class Writer
     include OGR::FFIOGR
 
-    attr_accessor :ds
+    attr_accessor :ptr
 
     def initialize;end
 
     def set_output(path, options={})
       path = File.expand_path(path)
       ds = OGR_Dr_CreateDataSource(@driver, path, nil)
-      @ds = OGR::Tools.cast_data_source(ds)
-      @ds
+      @ptr = OGR::Tools.cast_data_source(ds)
+      @ptr
     end
 
     def self.from_file_type(path)
@@ -36,7 +36,7 @@ module OGR
       writer = Writer.from_file_type output_path
       data_source = writer.ds
 
-      # @ds -> data_source
+      # @ptr -> data_source
     end
   end
 end
