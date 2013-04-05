@@ -205,6 +205,7 @@ module OGR
     attach_function :OGR_F_GetGeometryRef, [:pointer], :pointer
     attach_function :OGR_F_GetFID, [:pointer], :long
     attach_function :OGR_F_SetFID, [:pointer, :long], :pointer
+    attach_function :OGR_F_StealGeometry, [:pointer], :pointer
     attach_function :OGR_F_SetGeometry, [:pointer, :pointer], :pointer
     attach_function :OGR_F_SetGeometryDirectly, [:pointer, :pointer], :pointer
     attach_function :OGR_G_CreateFromWkb, [:pointer, :pointer, :pointer, :int], :pointer
@@ -302,6 +303,8 @@ module OGR
     attach_function :OSRDestroySpatialReference, [:pointer], :void
     attach_function :OCTNewCoordinateTransformation, [:pointer, :pointer], :pointer
     attach_function :OCTDestroyCoordinateTransformation, [:pointer], :void
+
+    OGRRegisterAll() # register all available OGR drivers
   end
 
   class << self

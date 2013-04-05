@@ -6,7 +6,6 @@ module OGR
 
     def initialize(ptr)
       @ptr = FFI::AutoPointer.new(ptr, self.class.method(:release))
-      #@ptr = FFI::AutoPointer.new(ptr)
       @ptr.autorelease = false
     end
 
@@ -16,35 +15,38 @@ module OGR
       FFIOGR.OGR_DS_Destroy(@ptr)
     end
 
-    def to_hash
-      h = {
-        layers: []
-      }
+    def transform(new_sr)
+      raise RuntimeError.new("No Spatial Reference specified") if new_sr.nil?
 
       layers.each do |layer|
-        name = layer.name
-        geometry_type = layer.geometry_type
-        spatial_reference = layer.spatial_ref.to_proj4
-        features = []
+        old_sr = layer.spatial_ref
+        ct = OGR::CoordinateTransformation.find_transformation(old_sr, new_sr)
 
         layer.features.each do |feature|
-          fields = feature.fields
-          geometry = OGR::Tools.cast_geometry(feature.geometry).to_geojson
-          features << {fields: fields, geometry: geometry}
+          geometry = OGR::Tools.cast_geometry(feature.geometry)
+          geometry_type = FFIOGR.OGR_G_GetGeometryType(geometry.ptr)
+          geometry.transform ct
+
+          p geometry.to_geojson
+
+          FFIOGR.OGR_F_StealGeometry(feature.ptr)
+          new_geometry = FFIOGR.OGR_G_CreateGeometry(geometry_type)
+          FFIOGR.OGR_G_AddGeometryDirectly(new_geometry, geometry.ptr)
+          FFIOGR.OGR_F_SetGeometryDirectly(feature.ptr, new_geometry)
         end
 
-        h[:layers] << {
-          name: name,
-          geometry_type: geometry_type,
-          spatial_reference: spatial_reference,
-          features: features
-        }
+        layer.sync
       end
-
-      h
     end
 
-    def copy(output_type, output_path, spatial_ref=nil)
+    def copy(output_type, output_path, options=nil)
+      # TODO: deal with options
+      driver = OGRGetDriverByName(OGR::DRIVER_TYPES[output_type.downcase])
+      new_ds = FFIOGR.OGR_Dr_CopyDataSource(driver, @ptr, File.expand_path(output_path), options)
+      FFIOGR.OGR_DS_Destroy(new_ds)
+    end
+
+    def copy_with_transform(output_type, output_path, spatial_ref=nil)
       writer = OGR::GenericWriter.new(OGR::DRIVER_TYPES[output_type.downcase])
       writer.set_output(output_path)
       out = writer.ptr
@@ -68,6 +70,11 @@ module OGR
           fd = FFIOGR.OGR_FD_GetFieldDefn(layer_definition, i)
           name = FFIOGR.OGR_Fld_GetNameRef(fd)
           type = FFIOGR.OGR_Fld_GetType(fd)
+
+          opts = {}
+
+          opts[:precision] = FFIOGR.OGR_Fld_GetPrecision(fd) if type == :real
+          opts[:width] = FFIOGR.OGR_Fld_GetWidth(fd) if type == :string
 
           new_layer.add_field name, type
         end
@@ -104,6 +111,7 @@ module OGR
 
         new_layer.sync
       end
+      out.free
     end
 
     def add_layer(name, geometry_type, spatial_ref=nil, options={})
@@ -148,12 +156,26 @@ module OGR
 
     def to_shp(output_path, spatial_ref=nil)
       raise RuntimeError.new("Output path not specified.") if output_path.nil?
-      copy('shapefile', output_path, spatial_ref)
+
+      # TODO: handle parsing of spatial_ref -> copy options
+
+      if spatial_ref.instance_of? OGR::SpatialReference
+        copy_with_transform('shapefile', output_path, spatial_ref)
+      elsif spatial_ref.nil?
+        copy('shapefile', output_path, spatial_ref)
+      end
     end
 
     def to_geojson(output_path, spatial_ref=nil)
       raise RuntimeError.new("Output path not specified.") if output_path.nil?
-      copy('geojson', output_path, spatial_ref)
+
+      # TODO: handle parsing of spatial_ref -> copy options
+
+      if spatial_ref.instance_of? OGR::SpatialReference
+        copy_with_transform('geojson', output_path, spatial_ref)
+      elsif spatial_ref.nil?
+        copy('geojson', output_path, spatial_ref)
+      end
     end
 
     def to_json(pretty=false)

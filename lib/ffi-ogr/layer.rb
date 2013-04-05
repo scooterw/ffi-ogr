@@ -40,9 +40,19 @@ module OGR
     end
     alias_method :spatial_ref, :get_spatial_ref
 
-    def add_field(name, field_type, field_width=32)
+    def add_field(name, field_type, options={})
+      type = field_type.to_sym
+      precision = options[:precision] || 1
+      width = options[:width] || 32
+
       field = FFIOGR.OGR_Fld_Create(name, field_type.to_sym)
-      FFIOGR.OGR_Fld_SetWidth(field, field_width)
+
+      if type == :real
+        FFIOGR.OGR_Fld_SetPrecision(field, precision)
+      else
+        FFIOGR.OGR_Fld_SetWidth(field, width)
+      end
+
       FFIOGR.OGR_L_CreateField(@ptr, field, 1)
       FFIOGR.OGR_Fld_Destroy(field)
     end

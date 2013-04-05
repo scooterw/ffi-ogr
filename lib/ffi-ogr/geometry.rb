@@ -69,6 +69,10 @@ module OGR
       end
     end
 
+    def is_3d?
+      !!(geometry_type.to_s =~ /_25d/)
+    end
+
     def flatten
       FFIOGR.OGR_G_FlattenTo2D(@ptr)
     end
