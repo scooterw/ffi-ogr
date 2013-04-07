@@ -27,8 +27,6 @@ module OGR
           geometry_type = FFIOGR.OGR_G_GetGeometryType(geometry.ptr)
           geometry.transform ct
 
-          p geometry.to_geojson
-
           FFIOGR.OGR_F_StealGeometry(feature.ptr)
           new_geometry = FFIOGR.OGR_G_CreateGeometry(geometry_type)
           FFIOGR.OGR_G_AddGeometryDirectly(new_geometry, geometry.ptr)
@@ -39,14 +37,13 @@ module OGR
       end
     end
 
-    def copy(output_type, output_path, options=nil)
-      # TODO: deal with options
+    def copy(output_type, output_path, driver_options=nil)
       driver = OGRGetDriverByName(OGR::DRIVER_TYPES[output_type.downcase])
-      new_ds = FFIOGR.OGR_Dr_CopyDataSource(driver, @ptr, File.expand_path(output_path), options)
+      new_ds = FFIOGR.OGR_Dr_CopyDataSource(driver, @ptr, File.expand_path(output_path), driver_options)
       FFIOGR.OGR_DS_Destroy(new_ds)
     end
 
-    def copy_with_transform(output_type, output_path, spatial_ref=nil)
+    def copy_with_transform(output_type, output_path, spatial_ref=nil, driver_options=nil)
       writer = OGR::GenericWriter.new(OGR::DRIVER_TYPES[output_type.downcase])
       writer.set_output(output_path)
       out = writer.ptr
@@ -59,7 +56,8 @@ module OGR
         ct = OGR::CoordinateTransformation.find_transformation(old_sr, spatial_ref) unless spatial_ref.nil? || (spatial_ref == old_sr)
 
         sr = spatial_ref.nil? ? nil : spatial_ref.ptr
-        new_layer = out.add_layer name, geometry_type, sr
+
+        new_layer = out.add_layer name, geometry_type, sr, driver_options
 
         ptr = layer.ptr
 
@@ -114,9 +112,8 @@ module OGR
       out.free
     end
 
-    def add_layer(name, geometry_type, spatial_ref=nil, options={})
-      # TODO: add options as StringList ...
-      layer = FFIOGR.OGR_DS_CreateLayer(@ptr, name, spatial_ref, geometry_type.to_sym, nil)
+    def add_layer(name, geometry_type, spatial_ref=nil, options=nil)
+      layer = FFIOGR.OGR_DS_CreateLayer(@ptr, name, spatial_ref, geometry_type.to_sym, options)
       OGR::Tools.cast_layer(layer)
     end
 
@@ -166,15 +163,27 @@ module OGR
       end
     end
 
-    def to_geojson(output_path, spatial_ref=nil)
+    def to_geojson(output_path, options=nil)
       raise RuntimeError.new("Output path not specified.") if output_path.nil?
 
-      # TODO: handle parsing of spatial_ref -> copy options
+      unless options.nil?
+        spatial_ref = options[:spatial_ref] ? options[:spatial_ref] : nil
 
-      if spatial_ref.instance_of? OGR::SpatialReference
-        copy_with_transform('geojson', output_path, spatial_ref)
-      elsif spatial_ref.nil?
-        copy('geojson', output_path, spatial_ref)
+        if options[:bbox]
+          bbox = FFI::MemoryPointer.from_string "WRITE_BBOX=YES"
+          driver_options = FFI::MemoryPointer.new :pointer, 1
+          driver_options[0].put_pointer 0, bbox
+        else
+          driver_options = nil
+        end
+
+        if spatial_ref
+          copy_with_transform('geojson', output_path, spatial_ref, driver_options)
+        else
+          copy('geojson', output_path, driver_options)
+        end
+      else
+        copy('geojson', output_path, nil)
       end
     end
 

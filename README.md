@@ -29,7 +29,7 @@ shp.to_json true
 new_sr = OGR::SpatialReference.from_epsg 3857
 # => #<OGR::SpatialReference:0x007fd859a0e6f8 @ptr=#<FFI::AutoPointer address=0x007fd85a11c100>>
 
-shp.to_shp '~/Desktop/reprojected_shp.shp', new_sr
+shp.to_shp '~/Desktop/reprojected_shp.shp', {spatial_ref: new_sr}
 # => Output reprojected SHP to specified file
 ```
 

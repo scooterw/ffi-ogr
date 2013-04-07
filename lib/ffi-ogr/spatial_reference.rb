@@ -7,12 +7,6 @@ module OGR
       @ptr.autorelease = false
     end
 
-    #def self.release(ptr)
-      # this causes an error on exit
-      # should manually release these
-      #FFIOGR.OSRDestroySpatialReference(ptr)
-    #end
-
     def self.release(ptr);end
 
     def free
@@ -42,7 +36,10 @@ module OGR
     end
 
     def import_wkt(wkt)
-      FFIOGR.OSRImportFromWkt(@ptr, wkt)
+      wkt_ptr = FFI::MemoryPointer.from_string wkt
+      wkt_ptr_ptr = FFI::MemoryPointer.new :pointer
+      wkt_ptr_ptr.put_pointer 0, wkt_ptr
+      FFIOGR.OSRImportFromWkt(@ptr, wkt_ptr_ptr)
     end
 
     def import_proj4(proj4)

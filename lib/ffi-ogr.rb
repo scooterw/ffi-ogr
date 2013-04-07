@@ -42,6 +42,7 @@ module OGR
   autoload :Envelope, File.join(OGR_BASE, 'envelope')
   autoload :SpatialReference, File.join(OGR_BASE, 'spatial_reference')
   autoload :CoordinateTransformation, File.join(OGR_BASE, 'coordinate_transformation')
+  autoload :OptionsStruct, File.join(OGR_BASE, 'options_struct')
 
   module FFIOGR
     def self.search_paths
@@ -119,12 +120,15 @@ module OGR
 
     attach_function :GDALVersionInfo, [:string], :string
 
+    attach_function :CPLSetConfigOption, [:string, :string], :void
+    attach_function :CPLSetThreadLocalConfigOption, [:string, :string], :void
+
     attach_function :OGRRegisterAll, [], :void
     attach_function :OGR_Dr_GetName, [:pointer], :string
     attach_function :OGR_Dr_Open, [:pointer, :string, :int], :pointer
     attach_function :OGR_Dr_TestCapability, [:pointer, :string], :int
-    attach_function :OGR_Dr_CreateDataSource, [:pointer, :string, :string], :pointer
-    attach_function :OGR_Dr_CopyDataSource, [:pointer, :pointer, :string, :string], :pointer
+    attach_function :OGR_Dr_CreateDataSource, [:pointer, :string, :pointer], :pointer
+    attach_function :OGR_Dr_CopyDataSource, [:pointer, :pointer, :string, :pointer], :pointer
     attach_function :OGR_Dr_DeleteDataSource, [:pointer, :string], :pointer
     attach_function :OGRGetDriverCount, [], :int
     attach_function :OGRGetDriver, [:int], :pointer
@@ -137,7 +141,7 @@ module OGR
     attach_function :OGR_DS_GetLayerByName, [:pointer, :string], :pointer
     attach_function :OGR_DS_DeleteLayer, [:pointer, :int], :pointer
     attach_function :OGR_DS_GetDriver, [:pointer], :pointer
-    attach_function :OGR_DS_CreateLayer, [:pointer, :string, :pointer, :ogr_geometry_type, :string], :pointer
+    attach_function :OGR_DS_CreateLayer, [:pointer, :string, :pointer, :ogr_geometry_type, :pointer], :pointer
     attach_function :OGR_DS_CopyLayer, [:pointer, :pointer, :string, :string], :pointer
     attach_function :OGR_DS_TestCapability, [:pointer, :string], :int
     attach_function :OGR_DS_ExecuteSQL, [:pointer, :string, :pointer, :string], :pointer
@@ -294,7 +298,7 @@ module OGR
     # SRS Functions
 
     attach_function :OSRNewSpatialReference, [:pointer], :pointer
-    attach_function :OSRImportFromWkt, [:pointer, :string], :pointer
+    attach_function :OSRImportFromWkt, [:pointer, :pointer], :pointer
     attach_function :OSRImportFromProj4, [:pointer, :string], :pointer
     attach_function :OSRImportFromEPSG, [:pointer, :int], :pointer
     attach_function :OSRExportToWkt, [:pointer, :pointer], :pointer
