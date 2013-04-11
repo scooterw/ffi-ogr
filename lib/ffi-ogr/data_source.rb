@@ -15,28 +15,6 @@ module OGR
       FFIOGR.OGR_DS_Destroy(@ptr)
     end
 
-    def transform(new_sr)
-      raise RuntimeError.new("No Spatial Reference specified") if new_sr.nil?
-
-      layers.each do |layer|
-        old_sr = layer.spatial_ref
-        ct = OGR::CoordinateTransformation.find_transformation(old_sr, new_sr)
-
-        layer.features.each do |feature|
-          geometry = OGR::Tools.cast_geometry(feature.geometry)
-          geometry_type = FFIOGR.OGR_G_GetGeometryType(geometry.ptr)
-          geometry.transform ct
-
-          FFIOGR.OGR_F_StealGeometry(feature.ptr)
-          new_geometry = FFIOGR.OGR_G_CreateGeometry(geometry_type)
-          FFIOGR.OGR_G_AddGeometryDirectly(new_geometry, geometry.ptr)
-          FFIOGR.OGR_F_SetGeometryDirectly(feature.ptr, new_geometry)
-        end
-
-        layer.sync
-      end
-    end
-
     def copy(output_type, output_path, driver_options=nil)
       driver = OGRGetDriverByName(OGR::DRIVER_TYPES[output_type.downcase])
       new_ds = FFIOGR.OGR_Dr_CopyDataSource(driver, @ptr, File.expand_path(output_path), driver_options)
@@ -170,6 +148,7 @@ module OGR
         spatial_ref = options[:spatial_ref] ? options[:spatial_ref] : nil
 
         if options[:bbox]
+          # this segfaults -- working on solution
           bbox = FFI::MemoryPointer.from_string "WRITE_BBOX=YES"
           driver_options = FFI::MemoryPointer.new :pointer, 1
           driver_options[0].put_pointer 0, bbox
