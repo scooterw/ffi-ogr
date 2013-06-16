@@ -23,7 +23,8 @@ Gem::Specification.new do |gem|
   gem.executables = ['ogr_console']
 
   gem.add_dependency 'ffi', '>= 1.6.0'
-  gem.add_dependency 'multi_json', '1.7.2'
+  gem.add_dependency 'multi_json', '>= 1.7.7'
+  gem.add_dependency 'faraday', '>= 0.8.7'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
