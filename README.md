@@ -3,6 +3,17 @@ ffi-ogr
 
 To run: `bin/ogr_console`
 
+To read from a known file type (currently SHP, JSON/GeoJSON, raw Github GeoJSON URL, Esri Feature Service URL):
+
+```ruby
+data = OGR.read('https://raw.github.com/colemanm/hurricanes/master/fl_2004_hurricanes.geojson')
+=> #<OGR::DataSource:0x007fb830aa3af8 @ptr=#<FFI::AutoPointer address=0x007fb8311ab990>>
+
+# output to SHP file
+data.to_shp '/~Desktop/github_to_shp.shp'
+=> nil
+```
+
 To read a shapefile:
 
 ```ruby
@@ -79,4 +90,4 @@ A writer may also be inferred by file extension (currently works for shp and jso
 writer = OGR::Writer.from_file_type '~/Documents/shapefiles/my_new.shp'
 ```
 
-Tested on: MRI 1.9.3-p392 and JRuby 1.7.3
+Tested on: MRI 1.9.3 / 2.0.0 and JRuby 1.7.3+
