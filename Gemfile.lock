@@ -1,17 +1,21 @@
 PATH
   remote: .
   specs:
-    ffi-ogr (0.0.1.pre)
-      ffi (= 1.5.0)
-      multi_json
+    ffi-ogr (0.0.1)
+      faraday (>= 0.8.7)
+      ffi (>= 1.6.0)
+      multi_json (>= 1.7.2)
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.2)
-    ffi (1.5.0)
-    ffi (1.5.0-java)
-    multi_json (1.7.2)
+    faraday (0.8.8)
+      multipart-post (~> 1.2.0)
+    ffi (1.9.0)
+    ffi (1.9.0-java)
+    multi_json (1.7.9)
+    multipart-post (1.2.0)
     rake (10.0.4)
     rspec (2.13.0)
       rspec-core (~> 2.13.0)

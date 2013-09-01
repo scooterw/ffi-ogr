@@ -13,6 +13,9 @@ module OGR
   autoload :GenericReader, File.join(OGR_BASE, 'generic_reader')
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
   autoload :GeoJSONReader, File.join(OGR_BASE, 'geo_json_reader')
+  autoload :UrlGeoJSONReader, File.join(OGR_BASE, 'url_geo_json_reader')
+  autoload :FeatureServiceReader, File.join(OGR_BASE, 'feature_service_reader')
+  autoload :GithubReader, File.join(OGR_BASE, 'github_reader')
   autoload :Writer, File.join(OGR_BASE, 'writer')
   autoload :GenericWriter, File.join(OGR_BASE, 'generic_writer')
   autoload :ShpWriter, File.join(OGR_BASE, 'shp_writer')
@@ -315,6 +318,18 @@ module OGR
     def gdal_version
       FFIOGR.GDALVersionInfo('RELEASE_NAME')
     end
+    
+    def get_available_drivers
+      drivers = []
+      count = FFIOGR.OGRGetDriverCount
+
+      for i in 0...count
+        drivers << FFIOGR.OGR_Dr_GetName(FFIOGR.OGRGetDriver(i))
+      end
+
+      drivers
+    end
+    alias_method :drivers, :get_available_drivers
 
     def to_binary(data)
       buf = FFI::MemoryPointer.new(:char, value.size)

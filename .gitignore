@@ -19,3 +19,7 @@ doc/
 
 .DS_Store
 .log
+
+# Development artifacts
+*.json
+*.geojson
