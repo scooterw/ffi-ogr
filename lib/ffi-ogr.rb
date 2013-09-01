@@ -340,5 +340,18 @@ module OGR
     def string_to_pointer(str)
       FFI::MemoryPointer.from_string(str)
     end
+
+    def read(source)
+      case source
+      when /http:|https:/
+        UrlGeoJSONReader.new.read source
+      when /.shp/
+        ShpReader.new.read source
+      when /.json|.geojson/
+        GeoJSONReader.new.read source
+      else
+        raise RuntimeError.new("Could not determine file type based on input")
+      end
+    end
   end
 end
