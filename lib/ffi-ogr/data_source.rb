@@ -141,6 +141,16 @@ module OGR
       end
     end
 
+    def to_csv(output_path, spatial_ref=nil)
+      raise RuntimeError.new("Output path not specified") if output_path.nil?
+
+      if spatial_ref.instance_of? OGR::SpatialReference
+        copy_with_transform('csv', output_path, spatial_ref)
+      elsif spatial_ref.nil?
+        copy('csv', output_path, spatial_ref)
+      end
+    end
+
     def to_geojson(output_path, options=nil)
       raise RuntimeError.new("Output path not specified.") if output_path.nil?
 

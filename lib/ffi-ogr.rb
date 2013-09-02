@@ -6,23 +6,28 @@ module OGR
 
   DRIVER_TYPES = {
     'shapefile' => 'ESRI Shapefile',
-    'geojson' => 'GeoJSON'
+    'geojson' => 'GeoJSON',
+    'csv' => 'CSV'
   }
 
   autoload :Reader, File.join(OGR_BASE, 'reader')
   autoload :GenericReader, File.join(OGR_BASE, 'generic_reader')
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
   autoload :GeoJSONReader, File.join(OGR_BASE, 'geo_json_reader')
+  autoload :CSVReader, File.join(OGR_BASE, 'csv_reader')
   autoload :UrlGeoJSONReader, File.join(OGR_BASE, 'url_geo_json_reader')
+  autoload :UrlCSVReader, File.join(OGR_BASE, 'url_csv_reader')
   autoload :FeatureServiceReader, File.join(OGR_BASE, 'feature_service_reader')
   autoload :GithubReader, File.join(OGR_BASE, 'github_reader')
   autoload :Writer, File.join(OGR_BASE, 'writer')
   autoload :GenericWriter, File.join(OGR_BASE, 'generic_writer')
   autoload :ShpWriter, File.join(OGR_BASE, 'shp_writer')
   autoload :GeoJSONWriter, File.join(OGR_BASE, 'geo_json_writer')
+  autoload :CSVWriter, File.join(OGR_BASE, 'csv_writer')
   autoload :DataSource, File.join(OGR_BASE, 'data_source')
   autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
   autoload :GeoJSON, File.join(OGR_BASE, 'geo_json')
+  autoload :CSV, File.join(OGR_BASE, 'csv')
   autoload :Tools, File.join(OGR_BASE, 'tools')
   autoload :Layer, File.join(OGR_BASE, 'layer')
   autoload :Feature, File.join(OGR_BASE, 'feature')
@@ -344,11 +349,17 @@ module OGR
     def read(source)
       case source
       when /http:|https:/
-        UrlGeoJSONReader.new.read source
+        if source =~ /.csv/
+          UrlCSVReader.new.read source
+        else
+          UrlGeoJSONReader.new.read source
+        end
       when /.shp/
         ShpReader.new.read source
       when /.json|.geojson/
         GeoJSONReader.new.read source
+      when /.csv/
+        CSVReader.new.read source
       else
         raise RuntimeError.new("Could not determine file type based on input")
       end
