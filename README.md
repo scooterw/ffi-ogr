@@ -3,7 +3,7 @@ ffi-ogr
 
 To run: `bin/ogr_console`
 
-To read from a known file type (currently SHP, JSON/GeoJSON, CSV, raw Github GeoJSON URL, raw (spatial) CSV URL Esri Feature Service URL):
+To read from a known file type (currently SHP, JSON/GeoJSON, CSV, raw Github GeoJSON URL, raw (spatial) CSV URL, Esri Feature Service URL):
 
 ```ruby
 data = OGR.read('https://raw.github.com/colemanm/hurricanes/master/fl_2004_hurricanes.geojson')
