@@ -7,7 +7,8 @@ module OGR
   DRIVER_TYPES = {
     'shapefile' => 'ESRI Shapefile',
     'geojson' => 'GeoJSON',
-    'csv' => 'CSV'
+    'csv' => 'CSV',
+    'kml' => 'KML'
   }
 
   autoload :Reader, File.join(OGR_BASE, 'reader')
@@ -15,8 +16,10 @@ module OGR
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
   autoload :GeoJSONReader, File.join(OGR_BASE, 'geo_json_reader')
   autoload :CSVReader, File.join(OGR_BASE, 'csv_reader')
+  autoload :KMLReader, File.join(OGR_BASE, 'kml_reader')
   autoload :UrlGeoJSONReader, File.join(OGR_BASE, 'url_geo_json_reader')
   autoload :UrlCSVReader, File.join(OGR_BASE, 'url_csv_reader')
+  autoload :UrlKMLReader, File.join(OGR_BASE, 'url_kml_reader')
   autoload :FeatureServiceReader, File.join(OGR_BASE, 'feature_service_reader')
   autoload :GithubReader, File.join(OGR_BASE, 'github_reader')
   autoload :Writer, File.join(OGR_BASE, 'writer')
@@ -24,10 +27,12 @@ module OGR
   autoload :ShpWriter, File.join(OGR_BASE, 'shp_writer')
   autoload :GeoJSONWriter, File.join(OGR_BASE, 'geo_json_writer')
   autoload :CSVWriter, File.join(OGR_BASE, 'csv_writer')
+  autoload :KMLWriter, File.join(OGR_BASE, 'kml_writer')
   autoload :DataSource, File.join(OGR_BASE, 'data_source')
   autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
   autoload :GeoJSON, File.join(OGR_BASE, 'geo_json')
   autoload :CSV, File.join(OGR_BASE, 'csv')
+  autoload :KML, File.join(OGR_BASE, 'kml')
   autoload :Tools, File.join(OGR_BASE, 'tools')
   autoload :Layer, File.join(OGR_BASE, 'layer')
   autoload :Feature, File.join(OGR_BASE, 'feature')
@@ -358,6 +363,8 @@ module OGR
         ShpReader.new.read source
       when /.json|.geojson/
         GeoJSONReader.new.read source
+      when /.kml/
+        KMLReader.new.read source
       when /.csv/
         CSVReader.new.read source
       else
