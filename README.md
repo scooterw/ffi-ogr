@@ -14,7 +14,7 @@ data.to_shp '~/Desktop/github_to_shp.shp'
 => nil
 
 # output to CSV file
-data.to_csv '~/Desktop/github_to_csv.shp'
+data.to_csv '~/Desktop/github_to_csv.csv'
 => nil
 ```
 

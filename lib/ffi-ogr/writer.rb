@@ -21,6 +21,8 @@ module OGR
           writer = ShpWriter.new
         elsif path =~ /.geojson|.json/
           writer = GeoJSONWriter.new
+        elsif path =~ /.kml/
+          writer = KMLWriter.new
         else
           raise RuntimeError.new("Could not determine appropriate writer for this file type")
         end
