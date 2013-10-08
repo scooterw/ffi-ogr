@@ -20,6 +20,8 @@ module OGR
         ShpReader.new
       elsif path =~ /.geojson|.json/
         GeoJSONReader.new
+      elsif path =~ /.kml/
+        KMLReader.new
       else
         raise RuntimeError.new("Could not determine appropriate reader for this file type")
       end
