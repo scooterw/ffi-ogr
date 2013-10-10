@@ -8,3 +8,7 @@ end
 task :release => :build do
   system "gem push ffi-ogr-#{OGR::VERSION}.gem"
 end
+
+require 'rspec/core/rake_task'
+task :default => :spec
+RSpec::Core::RakeTask.new
