@@ -129,36 +129,28 @@ module OGR
     end
     alias_method :fields, :get_fields
 
-    def to_shp(output_path, spatial_ref=nil)
+    def to_format(format, output_path, spatial_ref=nil)
       raise RuntimeError.new("Output path not specified.") if output_path.nil?
 
       # TODO: handle parsing of spatial_ref -> copy options
-
+      
       if spatial_ref.instance_of? OGR::SpatialReference
-        copy_with_transform('shapefile', output_path, spatial_ref)
+        copy_with_transform(format, output_path, spatial_ref)
       elsif spatial_ref.nil?
-        copy('shapefile', output_path, spatial_ref)
+        copy(format, output_path, spatial_ref)
       end
+    end
+
+    def to_shp(output_path, spatial_ref=nil)
+      to_format('shapefile', output_path, spatial_ref)
     end
 
     def to_csv(output_path, spatial_ref=nil)
-      raise RuntimeError.new("Output path not specified") if output_path.nil?
-
-      if spatial_ref.instance_of? OGR::SpatialReference
-        copy_with_transform('csv', output_path, spatial_ref)
-      elsif spatial_ref.nil?
-        copy('csv', output_path, spatial_ref)
-      end
+      to_format('csv', output_path, spatial_ref)
     end
 
     def to_kml(output_path, spatial_ref=nil)
-      raise RuntimeError.new("Output path not specified") if output_path.nil?
-
-      if spatial_ref.instance_of? OGR::SpatialReference
-        copy_with_transform('csv', output_path, spatial_ref)
-      elsif spatial_ref.nil?
-        copy('kml', output_path, spatial_ref)
-      end
+      to_format('kml', output_path, spatial_ref)
     end
 
     def to_geojson(output_path, options=nil)
