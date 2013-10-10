@@ -1,5 +1,16 @@
 [![Build Status](https://travis-ci.org/scooterw/ffi-ogr.png?branch=master)](https://travis-ci.org/scooterw/ffi-ogr) [![Code Climate](https://codeclimate.com/github/scooterw/ffi-ogr.png)](https://codeclimate.com/github/scooterw/ffi-ogr)
 
+GDAL must be installed:
+
+Mac: `brew install gdal`
+
+Ubuntu:
+`sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 16126D3A3E5C1192`
+`sudo apt-get install python-software-properties -y`
+`sudo add-apt-repository ppa:ubuntugis/ppa -y`
+`sudo apt-get update -qq`
+`sudo apt-get install libgdal-dev`
+
 ffi-ogr
 ... for convenient access to OGR functionality from Ruby
 
