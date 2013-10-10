@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/scooterw/ffi-ogr.png?branch=master)](https://travis-ci.org/scooterw/ffi-ogr)
+
 ffi-ogr
 ... for convenient access to OGR functionality from Ruby
 
