@@ -28,3 +28,5 @@ matrix:
     - rvm: rbx-20mode
       jdk: openjdk7
 
+before_install: ./before_install.sh
+
