@@ -133,11 +133,15 @@ module OGR
       raise RuntimeError.new("Output path not specified.") if output_path.nil?
 
       # TODO: handle parsing of spatial_ref -> copy options
-      
-      if spatial_ref.instance_of? OGR::SpatialReference
-        copy_with_transform(format, output_path, spatial_ref)
-      elsif spatial_ref.nil?
-        copy(format, output_path, spatial_ref)
+
+      unless spatial_ref
+        copy format, output_path, spatial_ref
+      else
+        if spatial_ref[:spatial_ref].instance_of? OGR::SpatialReference
+          copy_with_transform format, output_path, spatial_ref[:spatial_ref]
+        else
+          raise RuntimeError.new("Invalid spatial reference specified.")
+        end
       end
     end
 
