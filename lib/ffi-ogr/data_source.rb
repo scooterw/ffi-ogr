@@ -154,6 +154,7 @@ module OGR
     end
 
     def to_kml(output_path, spatial_ref=nil)
+      warn "KML output will always be in EPSG:4326" unless spatial_ref.nil?
       to_format('kml', output_path, spatial_ref)
     end
 
