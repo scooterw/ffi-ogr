@@ -13,15 +13,11 @@ module OGR
 
   autoload :Reader, File.join(OGR_BASE, 'reader')
   autoload :GenericReader, File.join(OGR_BASE, 'generic_reader')
+  autoload :HttpResourceReader, File.join(OGR_BASE, 'http_resource_reader')
   autoload :ShpReader, File.join(OGR_BASE, 'shp_reader')
   autoload :GeoJSONReader, File.join(OGR_BASE, 'geo_json_reader')
   autoload :CSVReader, File.join(OGR_BASE, 'csv_reader')
   autoload :KMLReader, File.join(OGR_BASE, 'kml_reader')
-  autoload :UrlGeoJSONReader, File.join(OGR_BASE, 'url_geo_json_reader')
-  autoload :UrlCSVReader, File.join(OGR_BASE, 'url_csv_reader')
-  autoload :UrlKMLReader, File.join(OGR_BASE, 'url_kml_reader')
-  autoload :FeatureServiceReader, File.join(OGR_BASE, 'feature_service_reader')
-  autoload :GithubReader, File.join(OGR_BASE, 'github_reader')
   autoload :Writer, File.join(OGR_BASE, 'writer')
   autoload :GenericWriter, File.join(OGR_BASE, 'generic_writer')
   autoload :ShpWriter, File.join(OGR_BASE, 'shp_writer')
@@ -325,6 +321,14 @@ module OGR
   end
 
   class << self
+    READER_KLASSES = {
+      'shp' => ShpReader,
+      'csv' => CSVReader,
+      'kml' => KMLReader,
+      'json' => GeoJSONReader,
+      'geojson' => GeoJSONReader
+    }
+
     def gdal_version
       FFIOGR.GDALVersionInfo('RELEASE_NAME')
     end
@@ -354,22 +358,16 @@ module OGR
     def read(source)
       case source
       when /http:|https:/
-        if source =~ /.csv/
-          UrlCSVReader.new.read source
-        else
-          UrlGeoJSONReader.new.read source
-        end
-      when /.shp/
-        ShpReader.new.read source
-      when /.json|.geojson/
-        GeoJSONReader.new.read source
-      when /.kml/
-        KMLReader.new.read source
-      when /.csv/
-        CSVReader.new.read source
+        HttpResourceReader.new.read source
       else
-        raise RuntimeError.new("Could not determine file type based on input")
+        ext = source.split('.').last
+        klass = READER_KLASSES[ext]
+
+        raise RuntimeError.new "Could not determine file type" if klass.nil?
+
+        klass.new.read source
       end
     end
   end
 end
+
