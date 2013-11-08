@@ -3,7 +3,7 @@ require 'securerandom'
 require 'faraday'
 
 module OGR
-  class HttpResourceReader
+  class HttpReader
     def read(url, writeable=false)
       file_extension = url.split('.').last
       driver = OGR::DRIVER_TYPES[file_extension]
@@ -26,7 +26,7 @@ module OGR
         f.write http_resource
       end
 
-      ds = GenericReader.new(driver).read(file_name, writeable)
+      ds = Reader.new(driver).read(file_name, writeable)
 
       FileUtils.rm file_name
 

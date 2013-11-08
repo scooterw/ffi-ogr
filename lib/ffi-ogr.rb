@@ -14,8 +14,7 @@ module OGR
   }
 
   autoload :Reader, File.join(OGR_BASE, 'reader')
-  autoload :GenericReader, File.join(OGR_BASE, 'generic_reader')
-  autoload :HttpResourceReader, File.join(OGR_BASE, 'http_resource_reader')
+  autoload :HttpReader, File.join(OGR_BASE, 'http_reader')
   autoload :Writer, File.join(OGR_BASE, 'writer')
   autoload :DataSource, File.join(OGR_BASE, 'data_source')
   autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
@@ -360,14 +359,14 @@ module OGR
     def read(source)
       case source
       when /http:|https:/
-        HttpResourceReader.new.read source
+        HttpReader.new.read source
       else
         extension = source.split('.').last
         driver = DRIVER_TYPES[extension]
 
         raise RuntimeError.new "Could not determine file type" if driver.nil?
 
-        GenericReader.new(driver).read source
+        Reader.new(driver).read source
       end
     end
   end

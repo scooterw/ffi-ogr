@@ -9,9 +9,11 @@ module OGR
       0 => false
     }
 
-    # Reader Class NOT to be used directly
-    # Use subclasses e.g. ShpReader
-    def initialize;end
+    def initialize(driver_name)
+      OGRRegisterAll()
+      @driver = OGRGetDriverByName(driver_name)
+      raise RuntimeError.new "Invalid driver name" if @driver.null?
+    end
 
     def read(file_path, writeable=false)
       ds = OGR_Dr_Open(@driver, File.expand_path(file_path), TF_MAP[writeable])
