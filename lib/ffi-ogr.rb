@@ -17,11 +17,6 @@ module OGR
   autoload :GenericReader, File.join(OGR_BASE, 'generic_reader')
   autoload :HttpResourceReader, File.join(OGR_BASE, 'http_resource_reader')
   autoload :Writer, File.join(OGR_BASE, 'writer')
-  autoload :GenericWriter, File.join(OGR_BASE, 'generic_writer')
-  autoload :ShpWriter, File.join(OGR_BASE, 'shp_writer')
-  autoload :GeoJSONWriter, File.join(OGR_BASE, 'geo_json_writer')
-  autoload :CSVWriter, File.join(OGR_BASE, 'csv_writer')
-  autoload :KMLWriter, File.join(OGR_BASE, 'kml_writer')
   autoload :DataSource, File.join(OGR_BASE, 'data_source')
   autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
   autoload :GeoJSON, File.join(OGR_BASE, 'geo_json')
@@ -343,6 +338,23 @@ module OGR
 
     def string_to_pointer(str)
       FFI::MemoryPointer.from_string(str)
+    end
+
+    def get_writer(source)
+      extension = source.split('.').last
+      driver = DRIVER_TYPES[extension]
+
+      raise RuntimeError.new "Could not find appropriate driver" if driver.nil?
+
+      Writer.new(driver)
+    end
+
+    def create_writer(path)
+      raise RuntimeError.new "Path already exists: #{path}" if File.exists?(path)
+
+      writer = get_writer path
+      writer.set_output path
+      writer
     end
 
     def read(source)
