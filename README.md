@@ -70,8 +70,7 @@ shp.to_shp '~/Desktop/reprojected_shp.shp', {spatial_ref: new_sr}
 To create a shapefile:
 
 ```ruby
-writer = OGR::ShpWriter.new
-writer.set_output '~/Documents/shapefiles/my_new.shp'
+writer = OGR.create_writer '~/Documents/shapefiles/my_new.shp'
 
 shp = writer.ptr
 
@@ -101,10 +100,11 @@ layer.add_feature feature
 layer.sync
 ```
 
-A writer may also be inferred by file extension (currently works for shp and json/geojson):
+A writer may be fetched by driver type:
 
 ```ruby
-writer = OGR::Writer.from_file_type '~/Documents/shapefiles/my_new.shp'
+writer = OGR.get_writer 'shp'
+writer.set_output '~/Documents/shapefiles/my_new.shp'
 ```
 
 Tested on: MRI (1.9/2.0), JRuby (1.9/2.0), and Rubinius (1.9/2.0)
