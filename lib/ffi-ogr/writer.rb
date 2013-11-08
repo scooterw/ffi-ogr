@@ -2,12 +2,13 @@ module OGR
   class Writer
     include OGR::FFIOGR
 
-    attr_accessor :ptr
+    attr_accessor :ptr, :type
 
     def initialize(driver_name)
       OGRRegisterAll()
       @driver = OGRGetDriverByName(driver_name)
       raise RuntimeError.new "Invalid driver name" if @driver.null?
+      @type = driver_name
     end
 
     def set_output(path, options={})
