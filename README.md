@@ -1,15 +1,21 @@
-[![Build Status](https://travis-ci.org/scooterw/ffi-ogr.png?branch=master)](https://travis-ci.org/scooterw/ffi-ogr) [![Code Climate](https://codeclimate.com/github/scooterw/ffi-ogr.png)](https://codeclimate.com/github/scooterw/ffi-ogr)
+[![Build Status](https://travis-ci.org/scooterw/ffi-ogr.png?branch=master)](https://travis-ci.org/scooterw/ffi-ogr)
+[![Code Climate](https://codeclimate.com/github/scooterw/ffi-ogr.png)](https://codeclimate.com/github/scooterw/ffi-ogr)
 
 GDAL must be installed:
 
-Mac: `brew install gdal`
+Mac:
+```
+brew install gdal
+```
 
 Ubuntu:
-`sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 16126D3A3E5C1192`
-`sudo apt-get install python-software-properties -y`
-`sudo add-apt-repository ppa:ubuntugis/ppa -y`
-`sudo apt-get update -qq`
-`sudo apt-get install libgdal-dev`
+```
+sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 16126D3A3E5C1192
+sudo apt-get install python-software-properties -y
+sudo add-apt-repository ppa:ubuntugis/ppa -y
+sudo apt-get update -qq
+sudo apt-get install libgdal-dev
+```
 
 ffi-ogr
 ... for convenient access to OGR functionality from Ruby
@@ -101,4 +107,4 @@ A writer may also be inferred by file extension (currently works for shp and jso
 writer = OGR::Writer.from_file_type '~/Documents/shapefiles/my_new.shp'
 ```
 
-Tested on: MRI 1.9.3 / 2.0.0 and JRuby 1.7.3+
+Tested on: MRI (1.9/2.0), JRuby (1.9/2.0), and Rubinius (1.9/2.0)
