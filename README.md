@@ -34,7 +34,7 @@ data.to_csv '~/Desktop/github_to_csv.csv'
 To read a shapefile:
 
 ```ruby
-shp = OGR::ShpReader.new.read './spec/data/ne_110m_coastline/ne_110m_coastline.shp'
+shp = OGR.read './spec/data/ne_110m_coastline/ne_110m_coastline.shp'
 # => #<OGR::DataSource:0x007fba4d19c328 @ptr=#<FFI::AutoPointer address=0x007fba4c4cdc50>>
 
 shp.to_geojson '~/Desktop/output.geojson'
@@ -44,7 +44,7 @@ shp.to_geojson '~/Desktop/output.geojson'
 To reproject a shapefile:
 
 ```ruby
-shp = OGR::ShpReader.new.read './spec/data/ne_110m_coastline/ne_110m_coastline.shp'
+shp = OGR.read './spec/data/ne_110m_coastline/ne_110m_coastline.shp'
 # => #<OGR::DataSource:0x007fba4d19c328 @ptr=#<FFI::AutoPointer address=0x007fba4c4cdc50>>
 
 shp.to_json
@@ -59,12 +59,6 @@ new_sr = OGR::SpatialReference.from_epsg 3857
 
 shp.to_shp '~/Desktop/reprojected_shp.shp', {spatial_ref: new_sr}
 # => Output reprojected SHP to specified file
-```
-
-A reader may also be inferred by file extension (currently works for shp and json/geojson):
-
-```ruby
-shp = OGR::Reader.from_file_type './spec/data/ne_110m_coastline/ne_110m_coastline.shp'
 ```
 
 To create a shapefile:
