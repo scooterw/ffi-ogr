@@ -331,14 +331,11 @@ module OGR
     end
     
     def get_available_drivers
-      drivers = []
-      count = FFIOGR.OGRGetDriverCount
-
-      for i in 0...count
-        drivers << FFIOGR.OGR_Dr_GetName(FFIOGR.OGRGetDriver(i))
+      [].tap do |drivers|
+        for i in 0...FFIOGR.OGRGetDriverCount
+          drivers << FFIOGR.OGR_Dr_GetName(FFIOGR.OGRGetDriver(i))
+        end
       end
-
-      drivers
     end
     alias_method :drivers, :get_available_drivers
 
