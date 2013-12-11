@@ -27,6 +27,7 @@ GEM
     rspec-expectations (2.13.0)
       diff-lcs (>= 1.1.3, < 2.0)
     rspec-mocks (2.13.0)
+    rubinius-coverage (2.0.3)
     rubysl (2.0.15)
       rubysl-abbrev (~> 2.0)
       rubysl-base64 (~> 2.0)
@@ -243,5 +244,6 @@ DEPENDENCIES
   json
   rake
   rspec
+  rubinius-coverage
   rubysl
   simplecov
