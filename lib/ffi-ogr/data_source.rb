@@ -22,7 +22,7 @@ module OGR
     end
 
     def copy_with_transform(output_type, output_path, spatial_ref=nil, driver_options=nil)
-      writer = OGR::GenericWriter.new(OGR::DRIVER_TYPES[output_type.downcase])
+      writer = OGR::Writer.new(OGR::DRIVER_TYPES[output_type.downcase])
       writer.set_output(output_path)
       out = writer.ptr
 
