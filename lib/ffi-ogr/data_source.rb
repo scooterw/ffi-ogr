@@ -129,58 +129,51 @@ module OGR
     end
     alias_method :fields, :get_fields
 
-    def to_format(format, output_path, spatial_ref=nil)
+    def to_format(format, output_path, options={}, driver_options=nil)
       raise RuntimeError.new("Output path not specified.") if output_path.nil?
 
-      # TODO: handle parsing of spatial_ref -> copy options
+      spatial_ref = options[:spatial_ref]
 
       unless spatial_ref
-        copy format, output_path, spatial_ref
+        copy format, output_path, driver_options
       else
-        if spatial_ref[:spatial_ref].instance_of? OGR::SpatialReference
-          copy_with_transform format, output_path, spatial_ref[:spatial_ref]
+        if spatial_ref.instance_of? OGR::SpatialReference
+          copy_with_transform format, output_path, spatial_ref, driver_options
         else
           raise RuntimeError.new("Invalid spatial reference specified.")
         end
       end
     end
 
-    def to_shp(output_path, spatial_ref=nil)
-      to_format('shapefile', output_path, spatial_ref)
+    def to_shp(output_path, options={})
+      to_format('shapefile', output_path, options)
     end
 
-    def to_csv(output_path, spatial_ref=nil)
-      to_format('csv', output_path, spatial_ref)
+    def to_csv(output_path, options={})
+      to_format('csv', output_path, options)
     end
 
-    def to_kml(output_path, spatial_ref=nil)
-      warn "KML output will always be in EPSG:4326" unless spatial_ref.nil?
-      to_format('kml', output_path, spatial_ref)
+    def to_kml(output_path, options={})
+      warn "KML output will always be in EPSG:4326" unless options[:spatial_ref].nil?
+      to_format('kml', output_path, options)
     end
 
-    def to_geojson(output_path, options=nil)
-      raise RuntimeError.new("Output path not specified.") if output_path.nil?
+    def to_geojson(output_path, options={})
+      driver_options = nil
 
-      unless options.nil?
-        spatial_ref = options[:spatial_ref] ? options[:spatial_ref] : nil
-
-        if options[:bbox]
-          # this segfaults -- working on solution
-          bbox = FFI::MemoryPointer.from_string "WRITE_BBOX=YES"
-          driver_options = FFI::MemoryPointer.new :pointer, 1
-          driver_options[0].put_pointer 0, bbox
-        else
-          driver_options = nil
-        end
-
-        if spatial_ref
-          copy_with_transform('geojson', output_path, spatial_ref, driver_options)
-        else
-          copy('geojson', output_path, driver_options)
-        end
-      else
-        copy('geojson', output_path, nil)
+      if options[:bbox]
+        # this segfaults -- working on solution
+        bbox = FFI::MemoryPointer.from_string "WRITE_BBOX=YES"
+        driver_options = FFI::MemoryPointer.new :pointer, 1
+        driver_options[0].put_pointer 0, bbox
       end
+
+      to_format('geojson', output_path, options, driver_options)
+    end
+
+    def parse_driver_options(options, driver_options=nil)
+      # not implemented
+      driver_options
     end
 
     def to_json(pretty=false)
