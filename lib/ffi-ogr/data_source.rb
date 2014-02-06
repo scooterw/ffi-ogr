@@ -129,10 +129,12 @@ module OGR
     end
     alias_method :fields, :get_fields
 
-    def to_format(format, output_path, options={}, driver_options=nil)
+    def to_format(format, output_path, options={})
       raise RuntimeError.new("Output path not specified.") if output_path.nil?
 
-      spatial_ref = options[:spatial_ref]
+      spatial_ref = options.delete :spatial_ref
+
+      driver_options = parse_driver_options options
 
       unless spatial_ref
         copy format, output_path, driver_options
@@ -146,33 +148,44 @@ module OGR
     end
 
     def to_shp(output_path, options={})
-      to_format('shapefile', output_path, options)
+      to_format('shapefile', output_path)
     end
 
     def to_csv(output_path, options={})
-      to_format('csv', output_path, options)
+      to_format('csv', output_path)
     end
 
     def to_kml(output_path, options={})
       warn "KML output will always be in EPSG:4326" unless options[:spatial_ref].nil?
+
       to_format('kml', output_path, options)
     end
 
     def to_geojson(output_path, options={})
-      driver_options = nil
-
-      if options[:bbox]
-        # this segfaults -- working on solution
-        bbox = FFI::MemoryPointer.from_string "WRITE_BBOX=YES"
-        driver_options = FFI::MemoryPointer.new :pointer, 1
-        driver_options[0].put_pointer 0, bbox
-      end
-
-      to_format('geojson', output_path, options, driver_options)
+      to_format('geojson', output_path, options)
     end
 
-    def parse_driver_options(options, driver_options=nil)
-      # not implemented
+    def parse_driver_options(options)
+      tf_values = {
+        true => "YES",
+        false => "NO"
+      }
+
+      pointers = [].tap do |ptrs|
+        options.each do |k,v|
+          tf_value = tf_values[v] || v
+          ptrs << FFI::MemoryPointer.from_string("#{k.to_s.upcase}=#{tf_value.upcase}")
+        end
+      end
+
+      pointers << nil
+
+      driver_options = FFI::MemoryPointer.new :pointer, pointers.size
+
+      pointers.each_with_index do |ptr, i|
+        driver_options[i].put_pointer 0, ptr
+      end
+
       driver_options
     end
 
