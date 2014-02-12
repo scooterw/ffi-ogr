@@ -21,7 +21,7 @@ describe OGR::DataSource do
   end
 
   it "should convert to KML" do
-    kml_file_name = './spec/data/ds_kml_test.csv'
+    kml_file_name = './spec/data/ds_kml_test.kml'
 
     ds = OGR::Reader.new('ESRI Shapefile').read './spec/data/ne_110m_coastline/ne_110m_coastline.shp'
 
