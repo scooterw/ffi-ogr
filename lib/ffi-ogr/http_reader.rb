@@ -4,6 +4,14 @@ require 'faraday'
 
 module OGR
   class HttpReader
+
+    TF_MAP = {
+      true => 1,
+      false => 0,
+      1 => true,
+      0 => false
+    }
+
     def read(url, writeable=false)
       file_extension = url.split('.').last
       driver = OGR::DRIVER_TYPES[file_extension]
@@ -18,19 +26,10 @@ module OGR
         end
       end
 
-      file_name = "#{SecureRandom.urlsafe_base64}.#{file_extension}"
-
-      http_resource = Faraday.get(url).body
-
-      File.open(file_name, 'wb') do |f|
-        f.write http_resource
-      end
-
-      ds = Reader.new(driver).read(file_name, writeable)
-
-      FileUtils.rm file_name
-
-      ds
+      http_data = Faraday.get(url).body
+      ogr_driver = OGR::FFIOGR::OGRGetDriverByName driver
+      data_source = OGR::FFIOGR::OGR_Dr_Open ogr_driver, http_data, TF_MAP[writeable]
+      OGR::Tools.cast_data_source data_source
     end
   end
 end
