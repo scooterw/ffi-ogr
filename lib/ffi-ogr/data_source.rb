@@ -47,12 +47,16 @@ module OGR
           name = FFIOGR.OGR_Fld_GetNameRef(fd)
           type = FFIOGR.OGR_Fld_GetType(fd)
 
-          opts = {}
+          opts = {}.tap do |o|
+            case type
+            when :real
+              o[:precision] = FFIOGR.OGR_Fld_GetPrecision fd
+            when :string
+              o[:width] = FFIOGR.OGR_Fld_GetWidth fd
+            end
+          end
 
-          opts[:precision] = FFIOGR.OGR_Fld_GetPrecision(fd) if type == :real
-          opts[:width] = FFIOGR.OGR_Fld_GetWidth(fd) if type == :string
-
-          new_layer.add_field name, type
+          new_layer.add_field name, type, opts
         end
 
         layer.features.each do |feature|
