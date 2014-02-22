@@ -302,6 +302,7 @@ module OGR
       OSRImportFromWkt: [[:pointer, :pointer], :pointer],
       OSRImportFromProj4: [[:pointer, :string], :pointer],
       OSRImportFromEPSG: [[:pointer, :int], :pointer],
+      OSRImportFromESRI: [[:pointer, :pointer], :pointer],
       OSRExportToWkt: [[:pointer, :pointer], :pointer],
       OSRExportToPrettyWkt: [[:pointer, :pointer, :int], :pointer],
       OSRExportToProj4: [[:pointer, :pointer], :pointer],

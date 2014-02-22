@@ -59,7 +59,7 @@ shp.to_json
 shp.to_json true
 # => Output GeoJSON string (pretty print)
 
-# epsg => import_sr(integer) or import_sr(integer, 'epsg'), proj4 => import_sr(string, 'proj4'), wkt => import_sr(string, 'wkt')
+# epsg => import_sr(integer) or import_sr(integer, 'epsg'), proj4 => import_sr(string, 'proj4'), wkt => import_sr(string, 'wkt'), esri => import_sr(string, 'esri')
 new_sr = OGR.import_sr 3857
 # => #<OGR::SpatialReference:0x007fd859a0e6f8 @ptr=#<FFI::AutoPointer address=0x007fd85a11c100>>
 

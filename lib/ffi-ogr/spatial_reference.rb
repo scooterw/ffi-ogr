@@ -35,6 +35,8 @@ module OGR
         sr.import_wkt sr_import
       when 'proj4'
         sr.import_proj4 sr_import
+      when 'esri'
+        sr.import_esri sr_import
       else
         raise RuntimeError.new "Format: #{format} is not currently supported"
       end
@@ -47,17 +49,26 @@ module OGR
       wkt_ptr = FFI::MemoryPointer.from_string wkt
       wkt_ptr_ptr = FFI::MemoryPointer.new :pointer
       wkt_ptr_ptr.put_pointer 0, wkt_ptr
-      FFIOGR.OSRImportFromWkt(@ptr, wkt_ptr_ptr)
+      FFIOGR.OSRImportFromWkt @ptr, wkt_ptr_ptr
     end
 
     def import_proj4(proj4_string)
       check_string proj4_string, 'proj4'
-      FFIOGR.OSRImportFromProj4(@ptr, proj4_string)
+      FFIOGR.OSRImportFromProj4 @ptr, proj4_string
     end
 
     def import_epsg(epsg_code)
       epsg_code = check_int epsg_code, 'epsg'
-      FFIOGR.OSRImportFromEPSG(@ptr, epsg_code)
+      FFIOGR.OSRImportFromEPSG @ptr, epsg_code
+    end
+
+    def import_esri(esri_string)
+      check_string esri_string, 'esri'
+      esri_ptr = FFI::MemoryPointer.from_string esri_string
+      esri_ptr_ptr = FFI::MemoryPointer.new :pointer, 2
+      esri_ptr_ptr[0].put_pointer 0, esri_ptr
+      esri_ptr_ptr[1].put_pointer 0, nil
+      FFIOGR.OSRImportFromESRI @ptr, esri_ptr_ptr
     end
 
     def to_wkt(pretty=false)
