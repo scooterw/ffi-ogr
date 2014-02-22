@@ -192,18 +192,18 @@ module OGR
     def to_json(pretty=false)
       h = {
         type: 'FeatureCollection',
-        bbox: nil,
         features: []
       }
 
       layers.each do |layer|
-        h[:bbox] = layer.envelope.to_a true
-        geometry_type = layer.geometry_type.to_s.capitalize
-
-        layer.features.each do |feature|
-          properties = feature.fields
-          geometry = OGR::Tools.cast_geometry(feature.geometry).to_geojson
-          h[:features] << {type: geometry_type, geometry: geometry, properties: properties}
+        h[:features].tap do |features|
+          layer.features.each do |feature|
+            features << {
+              type: 'Feature',
+              geometry: OGR::Tools.cast_geometry(feature.geometry).to_geojson,
+              properties: feature.fields
+            }
+          end
         end
       end
 
@@ -215,3 +215,4 @@ module OGR
     end
   end
 end
+
