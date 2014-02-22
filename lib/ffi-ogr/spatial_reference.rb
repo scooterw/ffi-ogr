@@ -13,40 +13,50 @@ module OGR
       FFIOGR.OSRDestroySpatialReference(@ptr)
     end
 
-    def self.create
-      OGR::Tools.cast_spatial_reference(FFIOGR.OSRNewSpatialReference(nil))
+    def check_int(sr_import, format = 'epsg')
+      begin
+        Integer(sr_import)
+      rescue => ex
+        raise RuntimeError.new "Format: #{format} requires an integer value"
+      end
     end
 
-    def self.from_wkt(wkt)
-      sr = OGR::Tools.cast_spatial_reference(FFIOGR.OSRNewSpatialReference(nil))
-      sr.import_wkt(wkt)
-      sr
+    def check_string(sr_import, format)
+      raise RuntimeError.new "Format: #{format} requires a string value" unless sr_import.instance_of? String
     end
 
-    def self.from_proj4(proj4)
+    def self.import(sr_import, format = 'epsg')
       sr = OGR::Tools.cast_spatial_reference(FFIOGR.OSRNewSpatialReference(nil))
-      sr.import_proj4(proj4)
-      sr
-    end
 
-    def self.from_epsg(epsg_code)
-      sr = OGR::Tools.cast_spatial_reference(FFIOGR.OSRNewSpatialReference(nil))
-      sr.import_epsg(epsg_code)
+      case format
+      when 'epsg'
+        sr.import_epsg sr_import
+      when 'wkt'
+        sr.import_wkt sr_import
+      when 'proj4'
+        sr.import_proj4 sr_import
+      else
+        raise RuntimeError.new "Format: #{format} is not currently supported"
+      end
+
       sr
     end
 
     def import_wkt(wkt)
+      check_string wkt, 'wkt'
       wkt_ptr = FFI::MemoryPointer.from_string wkt
       wkt_ptr_ptr = FFI::MemoryPointer.new :pointer
       wkt_ptr_ptr.put_pointer 0, wkt_ptr
       FFIOGR.OSRImportFromWkt(@ptr, wkt_ptr_ptr)
     end
 
-    def import_proj4(proj4)
-      FFIOGR.OSRImportFromProj4(@ptr, proj4)
+    def import_proj4(proj4_string)
+      check_string proj4_string, 'proj4'
+      FFIOGR.OSRImportFromProj4(@ptr, proj4_string)
     end
 
     def import_epsg(epsg_code)
+      epsg_code = check_int epsg_code, 'epsg'
       FFIOGR.OSRImportFromEPSG(@ptr, epsg_code)
     end
 
@@ -79,3 +89,4 @@ module OGR
     end
   end
 end
+

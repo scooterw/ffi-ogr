@@ -379,6 +379,11 @@ module OGR
         Reader.new(driver).read source
       end
     end
+
+    def import_spatial_ref(sr_import, format = 'epsg')
+      OGR::SpatialReference.import(sr_import, format)
+    end
+    alias_method :import_sr, :import_spatial_ref
   end
 end
 

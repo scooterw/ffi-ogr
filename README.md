@@ -59,8 +59,8 @@ shp.to_json
 shp.to_json true
 # => Output GeoJSON string (pretty print)
 
-# from_epsg(integer), from_proj4(string), from_wkt(string)
-new_sr = OGR::SpatialReference.from_epsg 3857
+# epsg => import_sr(integer) or import_sr(integer, 'epsg'), proj4 => import_sr(string, 'proj4'), wkt => import_sr(string, 'wkt')
+new_sr = OGR.import_sr 3857
 # => #<OGR::SpatialReference:0x007fd859a0e6f8 @ptr=#<FFI::AutoPointer address=0x007fd85a11c100>>
 
 shp.to_shp '~/Desktop/reprojected_shp.shp', {spatial_ref: new_sr}
