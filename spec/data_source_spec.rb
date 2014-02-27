@@ -7,7 +7,7 @@ describe OGR::DataSource do
 
   after(:all) do
     FileUtils.rm './spec/data/ds_csv_test.csv'
-    FileUtils.rm './spec/data/ds_kml_test.csv'
+    FileUtils.rm './spec/data/ds_kml_test.kml'
     FileUtils.rm_rf './spec/data/ds_shp_test'
   end
 

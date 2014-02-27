@@ -15,14 +15,14 @@ module OGR
       FFIOGR.OGR_DS_Destroy(@ptr)
     end
 
-    def copy(output_type, output_path, driver_options=nil)
-      driver = OGRGetDriverByName(OGR::DRIVER_TYPES[output_type.downcase])
+    def copy(driver_name, output_path, driver_options=nil)
+      driver = OGRGetDriverByName driver_name
       new_ds = FFIOGR.OGR_Dr_CopyDataSource(driver, @ptr, File.expand_path(output_path), driver_options)
       FFIOGR.OGR_DS_Destroy(new_ds)
     end
 
-    def copy_with_transform(output_type, output_path, spatial_ref=nil, driver_options=nil)
-      writer = OGR::Writer.new(OGR::DRIVER_TYPES[output_type.downcase])
+    def copy_with_transform(driver_name, output_path, spatial_ref=nil, driver_options=nil)
+      writer = OGR::Writer.new driver_name
       writer.set_output(output_path)
       out = writer.ptr
 
@@ -140,11 +140,13 @@ module OGR
 
       driver_options = parse_driver_options options
 
+      driver_name = OGR::DRIVER_TYPES[format]
+
       unless spatial_ref
-        copy format, output_path, driver_options
+        copy driver_name, output_path, driver_options
       else
         if spatial_ref.instance_of? OGR::SpatialReference
-          copy_with_transform format, output_path, spatial_ref, driver_options
+          copy_with_transform driver_name, output_path, spatial_ref, driver_options
         else
           raise RuntimeError.new("Invalid spatial reference specified.")
         end
@@ -160,9 +162,11 @@ module OGR
     end
 
     def to_kml(output_path, options={})
-      warn "KML output will always be in EPSG:4326" unless options[:spatial_ref].nil?
+      format = OGR.drivers.include?('LIBKML') ? 'kml' : 'kml_lite'
 
-      to_format('kml', output_path, options)
+      warn "GDAL is compiled without LIBKML support. Without LIBKML support KML output will always be in EPSG:4326" if format == 'kml_lite'
+
+      to_format(format, output_path, options)
     end
 
     def to_geojson(output_path, options={})

@@ -3,9 +3,16 @@
 
 GDAL must be installed:
 
-Mac:
+Mac (<= 10.8):
 ```
 brew install gdal
+```
+
+Mac (>= 10.9):
+
+Install GDAL from KyngChaos: http://www.kyngchaos.com/software/frameworks, then:
+```
+sudo ln -s /Library/Frameworks/GDAL.framework/Versions/Current/unix/lib/libgdal.dylib /usr/lib/libgdal.dylib
 ```
 
 Ubuntu:

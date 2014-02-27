@@ -10,7 +10,8 @@ module OGR
     'geojson' => 'GeoJSON',
     'json' => 'GeoJSON',
     'csv' => 'CSV',
-    'kml' => 'KML'
+    'kml' => 'LIBKML',
+    'kml_lite' => 'KML'
   }
 
   autoload :Reader, File.join(OGR_BASE, 'reader')
@@ -367,16 +368,21 @@ module OGR
       writer
     end
 
+    def get_driver_by_extension(extension)
+      unless extension == 'kml'
+        DRIVER_TYPES[extension]
+      else
+        drivers.include?('LIBKML') ? 'LIBKML' : 'KML'
+      end
+    end
+
     def read(source)
       case source
       when /http:|https:/
         HttpReader.new.read source
       else
-        extension = source.split('.').last
-        driver = DRIVER_TYPES[extension]
-
+        driver = get_driver_by_extension source.split('.').last
         raise RuntimeError.new "Could not determine file type" if driver.nil?
-
         Reader.new(driver).read source
       end
     end
