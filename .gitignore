@@ -23,3 +23,4 @@ doc/
 # Development artifacts
 *.json
 *.geojson
+Gemfile.lock
