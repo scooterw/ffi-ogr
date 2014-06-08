@@ -353,10 +353,7 @@ module OGR
 
     def get_writer(source)
       extension = source.split('.').last
-      driver = DRIVER_TYPES[extension]
-
-      raise RuntimeError.new "Could not find appropriate driver" if driver.nil?
-
+      driver = get_driver_by_extension extension
       Writer.new(driver)
     end
 
@@ -369,11 +366,15 @@ module OGR
     end
 
     def get_driver_by_extension(extension)
-      unless extension == 'kml'
+      driver = unless extension == 'kml'
         DRIVER_TYPES[extension]
       else
         drivers.include?('LIBKML') ? 'LIBKML' : 'KML'
       end
+
+      raise RuntimeError.new "Could not find appropriate driver" if driver.nil?
+
+      driver
     end
 
     def read(source)
