@@ -3,16 +3,10 @@
 
 GDAL must be installed:
 
-Mac (<= 10.8):
+Mac:
+NOTE: Add other flags, e.g. --with-postgresql, as desired
 ```
-brew install gdal
-```
-
-Mac (>= 10.9):
-
-Install GDAL from KyngChaos: http://www.kyngchaos.com/software/frameworks, then:
-```
-sudo ln -s /Library/Frameworks/GDAL.framework/Versions/Current/unix/lib/libgdal.dylib /usr/lib/libgdal.dylib
+brew install gdal --complete --enable-unsupported --with-libkml
 ```
 
 Ubuntu:
