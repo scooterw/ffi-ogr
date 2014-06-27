@@ -79,8 +79,8 @@ shp = writer.ptr
 # currently does not handle spatial reference, will automatically be nil
 layer = shp.add_layer 'first_layer', :point
 
-# add field to layer : add_field(name, field_type, width) NOTE: width defaults to 32
-layer.add_field 'name', :string
+# add field to layer : add_field(name, field_type, options) NOTE: options are width and precision, defaulting to 32 and 1 respectively.
+layer.add_field 'name', :string, width: 255
 
 # create feature on layer
 feature = layer.create_feature
