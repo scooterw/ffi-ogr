@@ -77,8 +77,6 @@ module OGR
 
     extend ::FFI::Library
 
-    ffi_lib(gdal_library_path)
-
     enum :ogr_field_type, [
       :integer, 0,
       :integer_list, 1,
