@@ -48,6 +48,7 @@ module OGR
     def execute_query(query, writeable = false)
       pg_driver = OGR_Dr_Open @driver, @db_config, TF_MAP[writeable]
       result_set = OGR_DS_ExecuteSQL pg_driver, query, nil, nil
+      OGR::Tools.cast_layer result_set
       # result_set is OGRLayer
       # must call OGR_DS_ReleaseResultSet(pg_driver, result_set) to clean up
     end
