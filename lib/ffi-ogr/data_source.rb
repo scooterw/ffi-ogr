@@ -154,11 +154,11 @@ module OGR
     end
 
     def to_shp(output_path, options={})
-      to_format('shapefile', output_path)
+      to_format('shapefile', output_path, options)
     end
 
     def to_csv(output_path, options={})
-      to_format('csv', output_path)
+      to_format('csv', output_path, options)
     end
 
     def to_kml(output_path, options={})
