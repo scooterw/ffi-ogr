@@ -1,6 +1,7 @@
 require 'fileutils'
 require 'securerandom'
 require 'faraday'
+require 'faraday_middleware'
 
 module OGR
   class HttpReader
@@ -26,7 +27,13 @@ module OGR
         end
       end
 
-      http_data = Faraday.get(url).body
+      connection = Faraday.new url do |conn|
+        conn.use FaradayMiddleware::FollowRedirects
+        conn.adapter Faraday.default_adapter
+      end
+
+      http_data = connection.get.body
+
       ogr_driver = OGR::FFIOGR::OGRGetDriverByName driver
       data_source = OGR::FFIOGR::OGR_Dr_Open ogr_driver, http_data, TF_MAP[writeable]
       OGR::Tools.cast_data_source data_source

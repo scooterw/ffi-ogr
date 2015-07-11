@@ -25,6 +25,7 @@ Gem::Specification.new do |gem|
   gem.add_dependency 'ffi', '~> 1.6', '>= 1.6.0'
   gem.add_dependency 'multi_json', '~> 1.7', '>= 1.7.2'
   gem.add_dependency 'faraday', '~> 0.8', '>= 0.8.7'
+  gem.add_dependency 'faraday_middleware', '~> 0.9', '>= 0.9.1'
 
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rspec'
