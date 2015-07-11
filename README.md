@@ -38,6 +38,33 @@ data.to_csv '~/Desktop/github_to_csv.csv'
 => nil
 ```
 
+To read from a PostGIS table:
+
+```ruby
+pg_options = {
+  'dbname' => 'my_db',
+  'host' => 'localhost',
+  'port' => 5432,
+  'user' => 'user',
+  'password' => 'p@$$w0rd'
+}
+# => {"dbname"=>"my_db", "host"=>"localhost", "port"=>5432, "user"=>"user", "password"=>"p@$$w0rd"}
+
+# pg_options may also be a string path to a YAML file
+pg_reader = OGR::PostgisReader.new pg_options
+# => #<OGR::PostgisReader:0x007fce88943b90 @db_config="PG:dbname='my_db' host='localhost' port='5432' user='user' password='p@$$w0rd'", @driver=#<FFI::Pointer address=0x007fce8a22d8f0>, @type="PostgreSQL">
+
+query = "select * from table_name where id = '49649d69-25a5-4dde-926d-b43a88c47d17'"
+# => "select * from table_name where id = '49649d69-25a5-4dde-926d-b43a88c47d17'"
+
+# output type of executed query is Layer
+layer = pg_reader.execute_query query
+# => #<OGR::Layer:0x007fce88b08390 @ptr=#<FFI::AutoPointer address=0x007fce8a20e0d0>>
+
+layer.features
+# => [#<OGR::Feature:0x007fce88af8008 @ptr=#<FFI::AutoPointer address=0x007fce8a2653b0>>, #<OGR::Feature:0x007fce88af3eb8 @ptr=#<FFI::AutoPointer address=0x007fce884e27b0>>]
+```
+
 To read a shapefile:
 
 ```ruby
