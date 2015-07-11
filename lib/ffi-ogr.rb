@@ -16,6 +16,7 @@ module OGR
 
   autoload :Reader, File.join(OGR_BASE, 'reader')
   autoload :HttpReader, File.join(OGR_BASE, 'http_reader')
+  autoload :PostgisReader, File.join(OGR_BASE, 'postgis_reader')
   autoload :Writer, File.join(OGR_BASE, 'writer')
   autoload :DataSource, File.join(OGR_BASE, 'data_source')
   autoload :Shapefile, File.join(OGR_BASE, 'shapefile')
