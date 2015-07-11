@@ -20,7 +20,12 @@ module OGR
     end
 
     def parse_db_config(db_config_file)
-      conf = YAML.load_file(File.expand_path(db_config_file))
+      conf =
+        if db_config_file.instance_of? String
+          YAML.load_file(File.expand_path(db_config_file))
+        elsif db_config_file.instance_of? Hash
+          db_config_file
+        end
 
       db_config = 'PG:'
       
